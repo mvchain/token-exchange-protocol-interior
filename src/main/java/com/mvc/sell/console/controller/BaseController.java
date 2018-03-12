@@ -1,0 +1,28 @@
+package com.mvc.sell.console.controller;
+
+import com.mvc.sell.console.service.AdminService;
+import org.omg.IOP.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+/**
+ * base controller
+ *
+ * @author qiyichen
+ * @create 2018/3/10 16:44
+ */
+@Controller
+public class BaseController {
+    @Autowired
+    AdminService adminService;
+    @Autowired
+    OrderService orderService;
+    @Autowired
+    ProjectService projectService;
+    @Autowired
+    AccountService accountService;
+    @Autowired
+    TransactionService transactionService;
+    @Autowired
+    ConfigService configService;
+}
