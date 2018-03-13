@@ -22,7 +22,7 @@ import javax.validation.Valid;
 public class OrderController  extends  BaseController{
 
     @GetMapping
-    Result list (@ModelAttribute Page page, @ModelAttribute @Valid OrderDTO orderDTO) {
+    Result list (@ModelAttribute @Valid OrderDTO orderDTO) {
         return ResultGenerator.genSuccessResult( orderService.list(orderDTO));
     }
 

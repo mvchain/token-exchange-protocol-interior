@@ -2,6 +2,7 @@ package com.mvc.sell.console.service;
 
 import com.mvc.common.msg.Result;
 import com.mvc.sell.console.pojo.bean.Config;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author qiyichen
  * @create 2018/3/13 11:02
  */
+@Service
 public class ConfigService extends BaseService {
 
 

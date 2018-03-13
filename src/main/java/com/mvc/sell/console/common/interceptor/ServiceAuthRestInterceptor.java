@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -25,7 +26,6 @@ import java.util.List;
 /**
  * @author qyc
  */
-@SuppressWarnings("ALL")
 public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
     private Logger logger = LoggerFactory.getLogger(ServiceAuthRestInterceptor.class);
 
@@ -50,11 +50,13 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
 
     private void checkAnnotation(Claims claim, NeedLogin loginAnn, Check checkAnn, String uri, HttpServletRequest request) throws LoginException, CheckeException {
         // check login
-        if (null == claim && null != loginAnn) {
-            throw new LoginException(MessageConstants.TOKEN_WRONG);
+//        if (null == claim && null != loginAnn) {
+//            throw new LoginException(MessageConstants.TOKEN_WRONG);
+//        }
+        if (null != claim) {
+            Boolean isFeign = "feign".equalsIgnoreCase(request.getHeader("type"));
+            JwtHelper.check(claim, uri, isFeign);
         }
-        Boolean isFeign = "feign".equalsIgnoreCase(request.getHeader("type"));
-        JwtHelper.check(claim, uri, isFeign);
         // check condition
         if (null != checkAnn) {
             for (String type : checkAnn.type()) {
@@ -86,7 +88,7 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
 
     public void setPage(HttpServletRequest request) {
         if ("GET".equalsIgnoreCase(request.getMethod())) {
-            String pageNo = request.getParameter("pageNo");
+            String pageNo = request.getParameter("pageNum");
             String pageSize = request.getParameter("pageSize");
             String orderBy = request.getParameter("orderBy");
             if (StringUtils.isNotBlank(pageNo) && StringUtils.isNotBlank(pageSize)) {

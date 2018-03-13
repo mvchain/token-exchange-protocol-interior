@@ -24,7 +24,7 @@ import java.util.List;
 public class TransactionController extends BaseController {
 
     @GetMapping()
-    Result<List<TransactionVO>> withdraw(@ModelAttribute Page page, @ModelAttribute @Valid TransactionDTO transactionDTO) {
+    Result<List<TransactionVO>> withdraw(@ModelAttribute @Valid TransactionDTO transactionDTO) {
         return ResultGenerator.genSuccessResult(transactionService.transaction(transactionDTO));
     }
 

@@ -6,6 +6,7 @@ import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.vo.ProjectVO;
 import com.mvc.sell.console.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author qiyichen
  * @create 2018/3/13 11:25
  */
+@Service
 public class ProjectService extends BaseService {
 
     @Autowired

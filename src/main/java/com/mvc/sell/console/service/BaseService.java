@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BaseService {
 
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(1024);
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(8);
 
     @Autowired
     AdminMapper adminMapper;

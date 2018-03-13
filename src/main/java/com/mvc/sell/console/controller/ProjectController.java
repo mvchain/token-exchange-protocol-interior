@@ -23,7 +23,7 @@ import java.util.List;
 public class ProjectController extends BaseController {
 
     @GetMapping
-    Result<List<ProjectVO>> list(@ModelAttribute Page page) {
+    Result<List<ProjectVO>> list() {
         return ResultGenerator.genSuccessResult(projectService.list());
     }
 

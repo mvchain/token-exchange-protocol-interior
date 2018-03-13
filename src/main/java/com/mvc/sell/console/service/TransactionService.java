@@ -6,6 +6,7 @@ import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import com.mvc.sell.console.util.BeanUtil;
 import com.sun.xml.internal.rngom.parse.host.Base;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * @author qiyichen
  * @create 2018/3/13 12:06
  */
+@Service
 public class TransactionService extends BaseService {
 
 

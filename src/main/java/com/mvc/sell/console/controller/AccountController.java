@@ -6,10 +6,7 @@ import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.NeedLogin;
 import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
@@ -20,19 +17,19 @@ import java.math.BigInteger;
  * @author qiyichen
  * @create 2018/3/10 17:17
  */
-@Controller
+@RestController
 @RequestMapping("account")
 public class AccountController extends BaseController {
 
     @GetMapping
     @NeedLogin
-    Result list(@ModelAttribute Page page, @ModelAttribute @Valid UserFindDTO userFindDTO) {
+    Result list(@ModelAttribute @Valid UserFindDTO userFindDTO) {
         return ResultGenerator.genSuccessResult(accountService.list(userFindDTO));
     }
 
-    @GetMapping
+    @GetMapping("{id}")
     @NeedLogin
-    Result get(@RequestParam BigInteger id) {
+    Result get(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(accountService.get(id));
     }
 

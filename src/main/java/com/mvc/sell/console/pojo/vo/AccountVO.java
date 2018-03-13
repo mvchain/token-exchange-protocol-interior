@@ -3,6 +3,8 @@ package com.mvc.sell.console.pojo.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * AccountVO
@@ -13,4 +15,14 @@ import java.io.Serializable;
 @Data
 public class AccountVO implements Serializable {
     private static final long serialVersionUID = 8363134325804839458L;
+
+    private BigInteger id;
+    private String username;
+    private String password;
+    private Date createdAt;
+    private Date updateAt;
+    private Integer status;
+    private String transactionPassword;
+    private String phone;
+
 }

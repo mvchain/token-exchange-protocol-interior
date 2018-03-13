@@ -4,6 +4,7 @@ import com.mvc.sell.console.pojo.bean.Order;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
 import com.mvc.sell.console.pojo.vo.OrderVO;
 import com.mvc.sell.console.util.BeanUtil;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author qiyichen
  * @create 2018/3/13 11:57
  */
+@Service
 public class OrderService extends BaseService {
     
     public void update(Order order) {

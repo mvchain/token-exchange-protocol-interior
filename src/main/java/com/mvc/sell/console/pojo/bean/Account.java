@@ -2,6 +2,7 @@ package com.mvc.sell.console.pojo.bean;
 
 import lombok.Data;
 
+import javax.persistence.Id;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -13,9 +14,8 @@ import java.util.Date;
  */
 @Data
 public class Account {
-
+    @Id
     private BigInteger id;
-    private String uid;
     private String username;
     private String password;
     private Date createdAt;

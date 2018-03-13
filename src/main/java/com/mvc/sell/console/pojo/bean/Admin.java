@@ -21,8 +21,7 @@ public class Admin {
     private String password;
     private Integer status;
     private String headImage;
-    private String uid;
-    private Data createdAt;
+    private Date createdAt;
     private Date updateAt;
 
 }

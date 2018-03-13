@@ -1,5 +1,6 @@
 package com.mvc.sell.console.util;
 
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
 
 import java.util.List;
@@ -13,12 +14,12 @@ import java.util.stream.Collectors;
  */
 public class BeanUtil {
 
-    public static List<?> beanList2VOList (List<? extends Object> list , Class targetClass) {
-        return list.stream().map(account1 -> {
+    public static PageInfo beanList2VOList (List<? extends Object> list , Class targetClass) {
+        List<Object> retult = list.stream().map(account1 -> {
             Object instance = null;
             try {
                 instance = targetClass.newInstance();
-                BeanUtils.copyProperties(account1, targetClass.newInstance());
+                BeanUtils.copyProperties(account1, instance);
             } catch (InstantiationException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -26,6 +27,7 @@ public class BeanUtil {
             }
             return instance;
         }).collect(Collectors.toList());
+        return new PageInfo(retult);
     }
 
     public static Object copyProperties(Object source, Object target) {

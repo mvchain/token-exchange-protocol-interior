@@ -2,6 +2,8 @@ package com.mvc.sell.console.pojo.bean;
 
 import lombok.Data;
 
+import java.math.BigInteger;
+
 /**
  * transaction
  *
@@ -10,5 +12,7 @@ import lombok.Data;
  */
 @Data
 public class Transaction {
+
+    private BigInteger id;
 
 }
