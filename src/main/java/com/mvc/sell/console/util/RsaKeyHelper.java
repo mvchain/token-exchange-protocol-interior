@@ -154,13 +154,5 @@ public class RsaKeyHelper {
         return (new BASE64Decoder()).decodeBuffer(s);
     }
 
-    public static void main(String[] args) throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        SecureRandom secureRandom = new SecureRandom("123".getBytes());
-        keyPairGenerator.initialize(1024, secureRandom);
-        KeyPair keyPair = keyPairGenerator.genKeyPair();
-        System.out.println(keyPair.getPublic().getEncoded());
-    }
-
 }
 
