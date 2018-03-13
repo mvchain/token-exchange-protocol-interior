@@ -2,11 +2,15 @@ package com.mvc.sell.console.controller;
 
 import com.github.pagehelper.Page;
 import com.mvc.common.msg.Result;
+import com.mvc.common.msg.ResultGenerator;
+import com.mvc.sell.console.pojo.bean.Project;
+import com.mvc.sell.console.pojo.vo.ProjectVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 
 /**
  * project controller
@@ -19,22 +23,24 @@ import java.math.BigInteger;
 public class ProjectController extends BaseController {
 
     @GetMapping
-    Result list(@ModelAttribute Page page) {
-        return projectService.list(page);
+    Result<List<ProjectVO>> list(@ModelAttribute Page page) {
+        return ResultGenerator.genSuccessResult(projectService.list());
     }
 
     @PostMapping
-    Result add(@RequestBody @Valid ProjectDTO projectDTO) {
-        return  projectService.insert(projectDTO);
+    Result add(@RequestBody @Valid Project project) {
+        projectService.insert(project);
+        return ResultGenerator.genSuccessResult();
     }
 
     @PutMapping
-    Result update(@RequestBody @Valid ProjectDTO projectDTO) {
-        return  projectService.udpate(projectDTO);
+    Result update(@RequestBody @Valid Project project) {
+        projectService.update(project);
+        return ResultGenerator.genSuccessResult();
     }
 
     @GetMapping("{id}")
-    Result get(@PathVariable BigInteger id) {
-        return projectService.get(id);
+    Result<ProjectVO> get(@PathVariable BigInteger id) {
+        return ResultGenerator.genSuccessResult(projectService.get(id));
     }
 }

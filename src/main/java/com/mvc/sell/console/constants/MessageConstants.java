@@ -7,4 +7,9 @@ package com.mvc.sell.console.constants;
 public interface MessageConstants {
 
     String PWD_ERR = "密码输入错误!";
+    String PWD_EMPTY = "密码不能为空";
+    String USERNAME_EMPTY = "用户名不能为空";
+    String TOKEN_WRONG = "token is wrong";
+    String TOKEN_EMPTY = "币种名称不能为空";
+    String TITLE_EMPTY = "请填写项目标题！";
 }

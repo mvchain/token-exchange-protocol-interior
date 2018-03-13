@@ -1,11 +1,17 @@
 package com.mvc.sell.console.controller;
 
 import com.github.pagehelper.Page;
+import com.mvc.common.msg.Result;
+import com.mvc.common.msg.ResultGenerator;
+import com.mvc.sell.console.pojo.dto.TransactionDTO;
+import com.mvc.sell.console.pojo.vo.TransactionVO;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
-import javax.xml.transform.Result;
+import java.util.List;
 
 /**
  * transaction controller
@@ -15,16 +21,16 @@ import javax.xml.transform.Result;
  */
 @Controller
 @RequestMapping("transaction")
-public class TransactionController extends BaseController{
+public class TransactionController extends BaseController {
 
-    @GetMapping("withdraw")
-    Result withdraw(@ModelAttribute Page page, @ModelAttribute @Valid WithdrawDTO withdrawDTO) {
-        return  transactionService.withdraw(page, withdrawDTO);
+    @GetMapping()
+    Result<List<TransactionVO>> withdraw(@ModelAttribute Page page, @ModelAttribute @Valid TransactionDTO transactionDTO) {
+        return ResultGenerator.genSuccessResult(transactionService.transaction(transactionDTO));
     }
 
-    @PostMapping("withdraw")
-    Result verify(@ModelAttribute @Valid WithdrawDTO withdrawDTO) {
-        return transactionService.verify(withdrawDTO);
-    }
+//    @PostMapping("withdraw")
+//    Result verify(@ModelAttribute @Valid WithdrawDTO withdrawDTO) {
+//        return transactionService.verify(withdrawDTO);
+//    }
 
 }
