@@ -26,8 +26,8 @@
         <targetXMLPackage>mapper</targetXMLPackage>
         <!-- 依赖版本 -->
         <mapper.version>3.4.0</mapper.version>
-        <mybatis.version>3.3.1</mybatis.version>
-        <mybatis.spring.version>1.2.4</mybatis.spring.version>
+        <mybatis.version>3.4.4</mybatis.version>
+        <mybatis.spring.version>1.3.1</mybatis.spring.version>
         <pagehelper.version>4.1.1</pagehelper.version>
     </properties>
 

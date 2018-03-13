@@ -12,4 +12,5 @@ import java.io.Serializable;
  */
 @Data
 public class TransactionDTO implements Serializable {
+    private static final long serialVersionUID = 7753553107052784799L;
 }

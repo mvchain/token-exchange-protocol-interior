@@ -3,6 +3,7 @@ package com.mvc.sell.console.pojo.bean;
 import com.mvc.sell.console.constants.MessageConstants;
 import lombok.Data;
 
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Date;
@@ -15,10 +16,8 @@ import java.util.Date;
  */
 @Data
 public class Config {
-
+    @Id
     private BigInteger id;
-    @NotNull(message = MessageConstants.TOKEN_EMPTY)
-    private String tokenName;
     private int rechargeStatus;
     private int withdrawStatus;
     private float min;

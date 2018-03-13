@@ -3,6 +3,7 @@ package com.mvc.sell.console.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.pojo.bean.Account;
+import com.mvc.sell.console.pojo.bean.Capital;
 import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import com.mvc.sell.console.pojo.vo.AccountVO;
 import com.mvc.sell.console.util.BeanUtil;
@@ -35,5 +36,11 @@ public class AccountService extends BaseService {
         t.setId(BigInteger.ONE);
         Account account = accountMapper.selectByPrimaryKey(t);
         return (AccountVO) BeanUtil.copyProperties(account, new AccountVO());
+    }
+
+    public Object balance(BigInteger id) {
+        Capital capital = new Capital();
+        capital.setUserId(id);
+        return capitalMapper.selectBalance(capital);
     }
 }

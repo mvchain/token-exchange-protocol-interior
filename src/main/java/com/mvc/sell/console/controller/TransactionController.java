@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
  * @author qiyichen
  * @create 2018/3/10 17:12
  */
-@Controller
+@RestController
 @RequestMapping("transaction")
 public class TransactionController extends BaseController {
 

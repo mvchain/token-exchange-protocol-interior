@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -31,6 +32,12 @@ public class AccountController extends BaseController {
     @NeedLogin
     Result get(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(accountService.get(id));
+    }
+
+    @GetMapping("{id}/balance")
+    @NeedLogin
+    Result balance(@PathVariable BigInteger id) {
+        return ResultGenerator.genSuccessResult(accountService.balance(id));
     }
 
 }

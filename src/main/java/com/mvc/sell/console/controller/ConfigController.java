@@ -15,7 +15,7 @@ import javax.validation.Valid;
  * @author qiyichen
  * @create 2018/3/10 16:44
  */
-@Controller
+@RestController
 @RequestMapping("config")
 public class ConfigController extends BaseController {
 

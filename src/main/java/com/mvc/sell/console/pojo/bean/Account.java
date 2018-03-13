@@ -23,5 +23,6 @@ public class Account {
     private Integer status;
     private String transactionPassword;
     private String phone;
+    private Integer orderNum;
 
 }

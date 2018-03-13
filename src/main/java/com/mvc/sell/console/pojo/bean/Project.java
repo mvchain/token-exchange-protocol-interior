@@ -1,10 +1,9 @@
 package com.mvc.sell.console.pojo.bean;
 
 import com.mvc.sell.console.constants.MessageConstants;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIInlineBinaryData;
 import lombok.Data;
-import org.web3j.abi.datatypes.Int;
 
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Date;
@@ -17,7 +16,7 @@ import java.util.Date;
  */
 @Data
 public class Project {
-
+    @Id
     private BigInteger id;
     @NotNull(message = MessageConstants.TITLE_EMPTY)
     private String title;
@@ -36,5 +35,6 @@ public class Project {
     private String description;
     private Date createdAt;
     private Date updatedAt;
+    private int status;
 
 }

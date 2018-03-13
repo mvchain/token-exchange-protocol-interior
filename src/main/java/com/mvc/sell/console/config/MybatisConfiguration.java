@@ -91,6 +91,12 @@ public class MybatisConfiguration implements EnvironmentAware {
         if (StringUtils.isNotBlank(typeAliasesPackage)) {
             bean.setTypeAliasesPackage(typeAliasesPackage);
         }
+        // 配置数据库表字段与对象属性字段的映射方式(下划线=》驼峰)
+        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+        configuration.setMapUnderscoreToCamelCase(true);
+        configuration.setUseGeneratedKeys(true);
+        bean.setConfiguration(configuration);
+
         //分页插件
         PageHelper pageHelper = new PageHelper();
         Properties properties = new Properties();

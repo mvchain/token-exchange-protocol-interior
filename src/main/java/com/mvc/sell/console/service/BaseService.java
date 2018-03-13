@@ -30,5 +30,9 @@ public class BaseService {
     @Autowired
     TransactionMapper transactionMapper;
     @Autowired
+    CapitalMapper capitalMapper;
+    @Autowired
+    ProjectSoldMapper tokenSoldMapper;
+    @Autowired
     RedisTemplate redisTemplate;
 }

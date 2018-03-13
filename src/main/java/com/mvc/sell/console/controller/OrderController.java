@@ -17,7 +17,7 @@ import javax.validation.Valid;
  * @author qiyichen
  * @create 2018/3/10 17:25
  */
-@Controller
+@RestController
 @RequestMapping("order")
 public class OrderController  extends  BaseController{
 
