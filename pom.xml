@@ -172,6 +172,7 @@
     </repositories>
 
     <build>
+        <finalName>token-sell-console</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
