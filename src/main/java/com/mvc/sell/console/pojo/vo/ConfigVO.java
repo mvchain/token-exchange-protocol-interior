@@ -1,22 +1,21 @@
-package com.mvc.sell.console.pojo.bean;
+package com.mvc.sell.console.pojo.vo;
 
-import com.mvc.sell.console.constants.MessageConstants;
 import lombok.Data;
 
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
- * Config
+ * Config vo
  *
  * @author qiyichen
- * @create 2018/3/13 11:04
+ * @create 2018/3/14 11:04
  */
 @Data
-public class Config {
-    @Id
+public class ConfigVO implements Serializable {
+    private static final long serialVersionUID = -1908092063796472159L;
+
     private BigInteger id;
     private int rechargeStatus;
     private int withdrawStatus;

@@ -16,9 +16,8 @@ import java.math.BigInteger;
 public class ProjectSold {
     @Id
     private BigInteger id;
-    private BigDecimal sold;
-    private BigDecimal tokenNum;
-    private BigDecimal tokenSold;
-    private Integer orderNum;
+    private Integer buyerNum;
+    private BigDecimal soldEth;
+    private BigDecimal sendToken;
 
 }

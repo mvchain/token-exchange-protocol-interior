@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -23,6 +24,8 @@ public class ProjectVO implements Serializable {
     private BigInteger id;
     private String title;
     private String tokenName;
+    private String contractAddress;
+    private BigDecimal ethNumber;
     private Float ratio;
     private Date startTime;
     private Date stopTime;

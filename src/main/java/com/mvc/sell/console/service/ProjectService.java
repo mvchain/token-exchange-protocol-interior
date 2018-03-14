@@ -5,11 +5,13 @@ import com.mvc.sell.console.pojo.bean.Config;
 import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.bean.ProjectSold;
 import com.mvc.sell.console.pojo.dto.ProjectDTO;
+import com.mvc.sell.console.pojo.vo.ProjectSoldVO;
 import com.mvc.sell.console.pojo.vo.ProjectVO;
 import com.mvc.sell.console.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -34,15 +36,23 @@ public class ProjectService extends BaseService {
         Project project = (Project) BeanUtil.copyProperties(projectDTO, new Project());
         projectMapper.insertSelective(project);
         Config config = new Config();
-        config.setId(project.getId());
+        config.setProjectId(project.getId());
+        config.setTokenName(project.getTokenName());
         configService.insert(config);
+        ProjectSold projectSold = new ProjectSold();
+        projectSold.setId(project.getId());
+        projectSold.setBuyerNum(0);
+        projectSold.setSendToken(BigDecimal.ZERO);
+        projectSold.setSoldEth(BigDecimal.ZERO);
+        tokenSoldMapper.insert(projectSold);
     }
 
     public void update(ProjectDTO projectDTO) {
         Project project = (Project) BeanUtil.copyProperties(projectDTO, new Project());
         projectMapper.updateByPrimaryKeySelective(project);
         Config config = new Config();
-        config.setId(project.getId());
+        config.setProjectId(project.getId());
+        config.setTokenName(project.getTokenName());
         configService.update(config);
     }
 
@@ -58,9 +68,9 @@ public class ProjectService extends BaseService {
         projectMapper.updateByPrimaryKeySelective(project);
     }
 
-    public ProjectSold getSold(BigInteger id) {
+    public ProjectSoldVO getSold(BigInteger id) {
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(id);
-        return tokenSoldMapper.selectOne(projectSold);
+        return tokenSoldMapper.selectSold(projectSold);
     }
 }

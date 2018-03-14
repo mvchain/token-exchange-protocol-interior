@@ -1,12 +1,9 @@
 package com.mvc.sell.console.controller;
 
-import com.github.pagehelper.Page;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
-import com.mvc.sell.console.pojo.bean.Order;
+import com.mvc.sell.console.pojo.bean.Orders;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
-import org.mockito.internal.matchers.Or;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,8 +24,8 @@ public class OrderController  extends  BaseController{
     }
 
     @PutMapping
-    Result update (@RequestBody @Valid Order order) {
-        orderService.update(order);
+    Result update (@RequestBody @Valid Orders orders) {
+        orderService.update(orders);
         return ResultGenerator.genSuccessResult();
     }
 

@@ -2,6 +2,7 @@ package com.mvc.sell.console.service;
 
 import com.mvc.common.msg.Result;
 import com.mvc.sell.console.pojo.bean.Config;
+import com.mvc.sell.console.pojo.vo.ConfigVO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,12 +1,14 @@
 package com.mvc.sell.console.service;
 
-import com.mvc.sell.console.pojo.bean.Order;
+import com.mvc.sell.console.pojo.bean.Orders;
+import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
 import com.mvc.sell.console.pojo.vo.OrderVO;
 import com.mvc.sell.console.util.BeanUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * OrderService
@@ -17,12 +19,22 @@ import java.util.List;
 @Service
 public class OrderService extends BaseService {
     
-    public void update(Order order) {
-        orderMapper.updateByPrimaryKeySelective(order);
+    public void update(Orders orders) {
+        orderMapper.updateByPrimaryKeySelective(orders);
     }
 
     public List<OrderVO> list(OrderDTO orderDTO) {
-        List<Order> list = orderMapper.selectByKey(orderDTO);
-        return (List<OrderVO>) BeanUtil.beanList2VOList(list, OrderVO.class);
+        Orders orders = (Orders) BeanUtil.copyProperties(orderDTO, new Orders());
+        List<Orders> list = orderMapper.select(orders);
+        Project project = new Project();
+        project.setId(orderDTO.getProjectId());
+        Project pj = projectMapper.selectByPrimaryKey(project);
+        List<OrderVO> result = list.stream().map(object -> {
+            OrderVO instance = (OrderVO) BeanUtil.copyProperties(object, new OrderVO());
+            instance.setProjectName(pj.getTokenName());
+            instance.setStatus(pj.getStatus());
+            return instance;
+        }).collect(Collectors.toList());
+        return result;
     }
 }

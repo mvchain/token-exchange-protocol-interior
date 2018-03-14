@@ -14,6 +14,6 @@ import java.util.List;
  * @create 2018/3/13 17:31
  */
 public interface CapitalMapper extends Mapper<Capital>{
-    @Select("select t1.*, t2.token_name tokenName from capital t1, token t2 where t2.id = t1.token_id and t1.user_id = #{userId} ")
+    @Select("select t1.*, t2.token_name from capital t1, config t2 where t2.id = t1.token_id and t1.user_id = #{userId} ")
     List<CapitalVO> selectBalance(Capital capital);
 }

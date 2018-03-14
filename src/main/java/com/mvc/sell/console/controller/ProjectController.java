@@ -6,6 +6,7 @@ import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.Page;
 import com.mvc.sell.console.pojo.bean.ProjectSold;
 import com.mvc.sell.console.pojo.dto.ProjectDTO;
+import com.mvc.sell.console.pojo.vo.ProjectSoldVO;
 import com.mvc.sell.console.pojo.vo.ProjectVO;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,11 +47,11 @@ public class ProjectController extends BaseController {
     }
 
     @GetMapping("{id}/sold")
-    Result<ProjectSold> sold(@PathVariable BigInteger id) {
+    Result<ProjectSoldVO> sold(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(projectService.getSold(id));
     }
 
-    @GetMapping("{id}/status/{status}")
+    @PutMapping("{id}/status/{status}")
     Result<ProjectVO> get(@PathVariable BigInteger id, @PathVariable Integer status) {
         projectService.updateStatus(id, status);
         return ResultGenerator.genSuccessResult();

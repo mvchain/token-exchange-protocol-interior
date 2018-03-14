@@ -1,22 +1,20 @@
-package com.mvc.sell.console.pojo.vo;
+package com.mvc.sell.console.pojo.bean;
 
 import lombok.Data;
 
-import java.io.Serializable;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
- * OrderVO
+ * Orders
  *
  * @author qiyichen
- * @create 2018/3/13 12:00
+ * @create 2018/3/13 11:57
  */
 @Data
-public class OrderVO implements Serializable {
-    private static final long serialVersionUID = 4830776689679004765L;
-
+public class Orders {
 
     private BigInteger id;
     private String orderId;
@@ -27,7 +25,5 @@ public class OrderVO implements Serializable {
     private BigDecimal ethNumber;
     private BigDecimal tokenNumber;
     private Integer orderStatus;
-    private String projectName;
-    private Integer status;
 
 }
