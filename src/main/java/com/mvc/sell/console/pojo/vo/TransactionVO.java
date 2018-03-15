@@ -18,7 +18,7 @@ public class TransactionVO implements Serializable {
     private static final long serialVersionUID = -3765613393191632039L;
 
     private BigInteger id;
-    private BigInteger uid;
+    private BigInteger userId;
     private String orderId;
     private Float poundage;
     private Date startAt;

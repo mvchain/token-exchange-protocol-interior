@@ -14,9 +14,14 @@ import java.math.BigInteger;
  */
 @Data
 public class CapitalVO implements Serializable{
+
+    private static final long serialVersionUID = 5197644464494680255L;
+
     private BigInteger id;
     private BigInteger tokenId;
     private BigDecimal balance;
     private String tokenName;
+    private Integer rechargeStatus;
+    private Integer withdrawStatus;
 
 }

@@ -17,12 +17,13 @@ public class Account {
     @Id
     private BigInteger id;
     private String username;
-    private String password;
     private Date createdAt;
     private Date updateAt;
     private Integer status;
+    private String password;
     private String transactionPassword;
     private String phone;
     private Integer orderNum;
+    private String addressEth;
 
 }

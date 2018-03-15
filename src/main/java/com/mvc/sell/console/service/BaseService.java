@@ -1,10 +1,13 @@
 package com.mvc.sell.console.service;
 
+import com.mvc.common.context.BaseContextHandler;
 import com.mvc.sell.console.dao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.math.BigInteger;
 
 /**
  * base service
@@ -35,4 +38,12 @@ public class BaseService {
     ProjectSoldMapper tokenSoldMapper;
     @Autowired
     RedisTemplate redisTemplate;
+
+    BigInteger getUserId() {
+        return (BigInteger) BaseContextHandler.get("userId");
+    }
+
+    String getOrderId(String type) {
+        return type + "001";
+    }
 }

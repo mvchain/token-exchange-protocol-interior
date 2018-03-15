@@ -1,9 +1,11 @@
 package com.mvc.sell.console.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.pojo.bean.Orders;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
+import com.mvc.sell.console.pojo.vo.OrderVO;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,7 +21,7 @@ import javax.validation.Valid;
 public class OrderController  extends  BaseController{
 
     @GetMapping
-    Result list (@ModelAttribute @Valid OrderDTO orderDTO) {
+    Result<PageInfo<OrderVO>> list (@ModelAttribute @Valid OrderDTO orderDTO) {
         return ResultGenerator.genSuccessResult( orderService.list(orderDTO));
     }
 

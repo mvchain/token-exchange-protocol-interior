@@ -1,5 +1,6 @@
 package com.mvc.sell.console.service;
 
+import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.pojo.bean.Orders;
 import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
@@ -18,23 +19,23 @@ import java.util.stream.Collectors;
  */
 @Service
 public class OrderService extends BaseService {
-    
+
     public void update(Orders orders) {
         orderMapper.updateByPrimaryKeySelective(orders);
     }
 
-    public List<OrderVO> list(OrderDTO orderDTO) {
+    public PageInfo<OrderVO> list(OrderDTO orderDTO) {
         Orders orders = (Orders) BeanUtil.copyProperties(orderDTO, new Orders());
         List<Orders> list = orderMapper.select(orders);
-        Project project = new Project();
-        project.setId(orderDTO.getProjectId());
-        Project pj = projectMapper.selectByPrimaryKey(project);
         List<OrderVO> result = list.stream().map(object -> {
+            Project project = new Project();
+            project.setId(object.getProjectId());
+            Project pj = projectMapper.selectByPrimaryKey(project);
             OrderVO instance = (OrderVO) BeanUtil.copyProperties(object, new OrderVO());
             instance.setProjectName(pj.getTokenName());
             instance.setStatus(pj.getStatus());
             return instance;
         }).collect(Collectors.toList());
-        return result;
+        return new PageInfo(result);
     }
 }

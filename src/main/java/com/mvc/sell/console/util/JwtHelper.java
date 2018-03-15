@@ -21,18 +21,10 @@ public class JwtHelper {
 
     private static Logger logger = Logger.getLogger(JwtHelper.class);
 
-    @Value("${service.name}")
-    private static String serviceName;
-    @Value("${service.expire}")
-    private static Long expire;
-    @Value("${service.refresh}")
-    private static Long refresh;
-    @Value("${service.base64Secret}")
-    private static String base64Secret;
-
-
-    private JwtHelper() {
-    }
+    public static String serviceName;
+    public static Long expire;
+    public static Long refresh;
+    public static String base64Secret;
 
     public static Claims parseJWT(String jsonWebToken) {
         try {
@@ -88,8 +80,6 @@ public class JwtHelper {
         if (uri.indexOf("/refresh") > 0 && !"refresh".equalsIgnoreCase(type)) {
             throw new LoginException("token type is wrong");
         } else if (uri.indexOf("/refresh") < 0 && !"token".equalsIgnoreCase(type)){
-            throw new LoginException("token type is wrong");
-        } else {
             throw new LoginException("token type is wrong");
         }
     }

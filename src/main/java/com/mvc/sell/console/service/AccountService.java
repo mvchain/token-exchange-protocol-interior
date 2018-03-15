@@ -31,10 +31,16 @@ public class AccountService extends BaseService {
     }
 
     public AccountVO get(BigInteger id) {
-        AccountVO accountVO = new AccountVO();
         Account t = new Account();
         t.setId(BigInteger.ONE);
         Account account = accountMapper.selectByPrimaryKey(t);
+        return (AccountVO) BeanUtil.copyProperties(account, new AccountVO());
+    }
+
+    public AccountVO getByUserName(String username) {
+        Account t = new Account();
+        t.setUsername(username);
+        Account account = accountMapper.selectOne(t);
         return (AccountVO) BeanUtil.copyProperties(account, new AccountVO());
     }
 
@@ -43,4 +49,13 @@ public class AccountService extends BaseService {
         capital.setUserId(id);
         return capitalMapper.selectBalance(capital);
     }
+
+    public void create(Account account) {
+        accountMapper.insertSelective(account);
+    }
+
+    public void update(Account account) {
+        accountMapper.updateByPrimaryKeySelective(account);
+    }
+
 }

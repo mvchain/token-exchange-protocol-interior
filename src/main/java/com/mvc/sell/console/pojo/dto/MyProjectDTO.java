@@ -7,18 +7,15 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
- * TransactionDTO
- *
  * @author qiyichen
- * @create 2018/3/13 12:06
+ * @create 2018/3/14 19:06
  */
 @Data
-public class TransactionDTO extends Page implements Serializable {
-    private static final long serialVersionUID = 7753553107052784799L;
+public class MyProjectDTO extends Page implements Serializable {
+    private static final long serialVersionUID = -4568956783195995014L;
 
+    private BigInteger id;
     private BigInteger userId;
-    private String orderId;
-    private Integer type;
     private Integer status;
 
 }

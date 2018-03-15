@@ -2,7 +2,9 @@ package com.mvc.sell.console.config;
 
 import com.mvc.common.handler.GlobalExceptionHandler;
 import com.mvc.sell.console.common.interceptor.ServiceAuthRestInterceptor;
+import com.mvc.sell.console.util.JwtHelper;
 import feign.Request;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,6 +21,16 @@ import java.util.Collections;
 @Configuration("admimWebConfig")
 @Primary
 public class WebConfiguration extends WebMvcConfigurerAdapter {
+
+    @Value("${service.name}")
+    private String serviceName;
+    @Value("${service.expire}")
+    private Long expire;
+    @Value("${service.refresh}")
+    private Long refresh;
+    @Value("${service.base64Secret}")
+    private String base64Secret;
+
     @Bean
     GlobalExceptionHandler getGlobalExceptionHandler() {
         return new GlobalExceptionHandler();
@@ -56,4 +68,12 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         return new Request.Options(10 * 1000, 10 * 1000);
     }
 
+    @Bean
+    JwtHelper jwtHelper() {
+        JwtHelper.serviceName = serviceName;
+        JwtHelper.expire = expire;
+        JwtHelper.refresh = refresh;
+        JwtHelper.base64Secret = base64Secret;
+        return new JwtHelper();
+    }
 }

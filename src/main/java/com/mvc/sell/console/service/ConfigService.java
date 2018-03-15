@@ -28,4 +28,8 @@ public class ConfigService extends BaseService {
     public void update(Config config) {
         configMapper.updateByPrimaryKeySelective(config);
     }
+
+    public List<String> token() {
+        return configMapper.token();
+    }
 }

@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 public class Page {
-    private int pageNum;
-    private int pageSize;
+    private Integer pageNum;
+    private Integer pageSize;
     private String orderBy;
 }

@@ -2,6 +2,7 @@ package com.mvc.sell.console.pojo.bean;
 
 import com.mvc.sell.console.constants.MessageConstants;
 import lombok.Data;
+import org.web3j.abi.datatypes.Int;
 
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
@@ -18,14 +19,15 @@ import java.util.Date;
 public class Config {
     @Id
     private BigInteger id;
-    private int rechargeStatus;
-    private int withdrawStatus;
-    private float min;
-    private float max;
-    private float poundage;
+    private Integer rechargeStatus;
+    private Integer withdrawStatus;
+    private Float min;
+    private Float max;
+    private Float poundage;
     private Date createdAt;
     private Date updatedAt;
     private BigInteger projectId;
     private String tokenName;
+    private Integer needShow;
 
 }

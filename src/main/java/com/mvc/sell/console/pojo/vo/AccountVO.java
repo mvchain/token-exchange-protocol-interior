@@ -23,4 +23,8 @@ public class AccountVO implements Serializable {
     private Integer status;
     private String phone;
     private Integer orderNum;
+    private String password;
+    private String transactionPassword;
+    private String addressEth;
+
 }

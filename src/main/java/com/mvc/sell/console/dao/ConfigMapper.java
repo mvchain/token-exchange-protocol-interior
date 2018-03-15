@@ -14,4 +14,6 @@ import java.util.List;
  * @create 2018/3/12 14:47
  */
 public interface ConfigMapper extends Mapper<Config> {
+    @Select("select token_name from config where need_show = 1")
+    List<String> token();
 }

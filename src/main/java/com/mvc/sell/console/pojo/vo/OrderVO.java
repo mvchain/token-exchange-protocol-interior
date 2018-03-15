@@ -22,7 +22,7 @@ public class OrderVO implements Serializable {
     private String orderId;
     private Date createdAt;
     private Date updatedAt;
-    private BigInteger uid;
+    private BigInteger userId;
     private BigInteger projectId;
     private BigDecimal ethNumber;
     private BigDecimal tokenNumber;

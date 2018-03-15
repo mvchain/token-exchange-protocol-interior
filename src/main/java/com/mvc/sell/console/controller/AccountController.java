@@ -4,7 +4,9 @@ import com.github.pagehelper.Page;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.NeedLogin;
+import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.dto.UserFindDTO;
+import com.mvc.sell.console.pojo.vo.AccountVO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,10 +36,28 @@ public class AccountController extends BaseController {
         return ResultGenerator.genSuccessResult(accountService.get(id));
     }
 
+    @GetMapping("username")
+    @NeedLogin
+    Result<AccountVO> get(@RequestParam String username) {
+        return ResultGenerator.genSuccessResult(accountService.getByUserName(username));
+    }
+
     @GetMapping("{id}/balance")
     @NeedLogin
     Result balance(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(accountService.balance(id));
+    }
+
+    @PostMapping
+    Result create(@RequestBody Account account) {
+        accountService.create(account);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @PutMapping
+    Result update(@RequestBody Account account) {
+        accountService.update(account);
+        return ResultGenerator.genSuccessResult();
     }
 
 }

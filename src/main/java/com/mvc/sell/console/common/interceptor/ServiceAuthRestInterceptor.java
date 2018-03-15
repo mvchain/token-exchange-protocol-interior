@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.web3j.abi.datatypes.Int;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
@@ -80,9 +81,9 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
     public void setUserInfo(Claims userInfo) {
         if (null != userInfo) {
             String username = userInfo.get("username", String.class);
-            BigInteger userId = userInfo.get("userId", BigInteger.class);
+            Integer userId = userInfo.get("userId", Integer.class);
             BaseContextHandler.set("username", username);
-            BaseContextHandler.set("userId", userId);
+            BaseContextHandler.set("userId", BigInteger.valueOf(userId.longValue()));
         }
     }
 

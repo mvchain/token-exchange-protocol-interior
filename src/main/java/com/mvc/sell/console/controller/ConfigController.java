@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * config controller
@@ -38,5 +39,11 @@ public class ConfigController extends BaseController {
         configService.update(config);
         return ResultGenerator.genSuccessResult();
     }
+
+
+    @GetMapping(value = "token")
+    Result<List<String>> config(){
+        return ResultGenerator.genSuccessResult(configService.token());
+    };
 
 }

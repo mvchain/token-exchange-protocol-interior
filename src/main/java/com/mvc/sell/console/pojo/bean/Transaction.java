@@ -18,7 +18,7 @@ public class Transaction {
 
     @Id
     private BigInteger id;
-    private BigInteger uid;
+    private BigInteger userId;
     private String orderId;
     private Float poundage;
     private Date startAt;
@@ -26,7 +26,7 @@ public class Transaction {
     private Date createdAt;
     private Date updatedAt;
     private BigDecimal number;
-    private BigInteger realNumber;
+    private BigDecimal realNumber;
     private BigInteger tokenId;
     private String fromAddress;
     private String toAddress;
