@@ -1,9 +1,7 @@
 package com.mvc.sell.console.service;
 
 import com.mvc.common.context.BaseContextHandler;
-import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.dao.*;
-import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

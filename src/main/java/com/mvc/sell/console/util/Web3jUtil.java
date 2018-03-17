@@ -1,7 +1,6 @@
 package com.mvc.sell.console.util;
 
 import com.mvc.sell.console.constants.RedisConstants;
-import com.mvc.sell.console.pojo.bean.Config;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.utils.Convert;
@@ -46,10 +45,19 @@ public class Web3jUtil {
         if (null == tokenId) {
             return null;
         }
-        if (tokenId .equals( BigInteger.ZERO)) {
+        if (tokenId.equals(BigInteger.ZERO)) {
             return Convert.fromWei(new BigDecimal(value), Convert.Unit.ETHER);
         }
         Convert.Unit unit = (Convert.Unit) redisTemplate.opsForValue().get(RedisConstants.UNIT + "#" + tokenId);
         return Convert.fromWei(new BigDecimal(value), unit);
+    }
+
+    public static BigInteger getWei(BigDecimal realNumber, BigInteger tokenId, RedisTemplate redisTemplate) {
+        if (null == tokenId || BigInteger.ZERO.equals(tokenId)) {
+            return Convert.toWei(realNumber, Convert.Unit.ETHER).toBigInteger();
+        } else {
+            Convert.Unit unit = (Convert.Unit) redisTemplate.opsForValue().get(RedisConstants.UNIT + "#" + tokenId);
+            return Convert.toWei(realNumber, unit).toBigInteger();
+        }
     }
 }

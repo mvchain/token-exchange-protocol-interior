@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenVO implements Serializable{
+public class TokenVO implements Serializable {
 
 
     private static final long serialVersionUID = -2962447657047492746L;

@@ -1,6 +1,6 @@
 package com.mvc.sell.console.job;
 
-import com.mvc.sell.console.service.TransactionService;
+import com.mvc.sell.console.service.ProjectService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,18 +17,18 @@ import java.io.IOException;
  */
 @Component
 @Log4j
-public class EthJob {
+public class ProjectJob {
 
     @Autowired
-    TransactionService transactionService;
+    ProjectService projectService;
     @Autowired
     Web3j web3j;
 
-    @Scheduled(cron = "*/10 * * * * ?")
-    public void updateAddress() throws IOException {
-        Integer num = transactionService.newAddress();
+    @Scheduled(cron = "*/30 * * * * ?")
+    public void updateStatus() throws IOException {
+        Integer num = projectService.updateStatus();
         if (num > 0) {
-            log.info(String.format("%s user update eth address", num));
+            log.info(String.format("%s project update status", num));
         }
     }
 

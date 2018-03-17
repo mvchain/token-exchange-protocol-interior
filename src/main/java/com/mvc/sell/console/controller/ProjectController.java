@@ -9,7 +9,6 @@ import com.mvc.sell.console.pojo.dto.MyProjectDTO;
 import com.mvc.sell.console.pojo.dto.ProjectDTO;
 import com.mvc.sell.console.pojo.dto.WithdrawDTO;
 import com.mvc.sell.console.pojo.vo.*;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,17 +40,20 @@ public class ProjectController extends BaseController {
         projectService.insert(project);
         return ResultGenerator.genSuccessResult();
     }
+
     @ApiOperation("修改项目")
     @PutMapping
     Result update(@RequestBody @Valid ProjectDTO project) {
         projectService.update(project);
         return ResultGenerator.genSuccessResult();
     }
+
     @ApiOperation("获取单项项目详情")
     @GetMapping("{id}")
     Result<ProjectVO> get(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(projectService.get(id));
     }
+
     @ApiOperation("项目销售总数据")
     @GetMapping("{id}/sold")
     Result<ProjectSoldVO> sold(@PathVariable BigInteger id) {
@@ -62,6 +64,34 @@ public class ProjectController extends BaseController {
     @GetMapping("signature")
     Result<Map> doGetSignature(@RequestParam String dir) throws UnsupportedEncodingException {
         return ResultGenerator.genSuccessResult(ossService.doGetSignature(dir));
+    }
+
+    @ApiOperation("修改展示状态")
+    @PutMapping("{id}/show/{show}")
+    Result show(@PathVariable BigInteger id, @PathVariable Integer show) {
+        projectService.updateShow(id, show);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @ApiOperation("发币")
+    @PutMapping("{id}/sendToken/{sendToken}")
+    Result sendToken(@PathVariable BigInteger id, @PathVariable Integer sendToken) {
+        projectService.sendToken(id, sendToken);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @ApiOperation("清退")
+    @PutMapping("{id}/retire/{retire}")
+    Result retire(@PathVariable BigInteger id, @PathVariable Integer retire) {
+        projectService.retire(id, retire);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @ApiOperation("删除")
+    @DeleteMapping("{id}")
+    Result retire(@PathVariable BigInteger id) {
+        projectService.delete(id);
+        return ResultGenerator.genSuccessResult();
     }
 
     @PutMapping("{id}/status/{status}")

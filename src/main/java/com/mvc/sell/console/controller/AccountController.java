@@ -1,17 +1,15 @@
 package com.mvc.sell.console.controller;
 
-import com.github.pagehelper.Page;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.NeedLogin;
 import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import com.mvc.sell.console.pojo.vo.AccountVO;
-import org.springframework.stereotype.Controller;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -24,10 +22,18 @@ import java.math.BigInteger;
 @RequestMapping("account")
 public class AccountController extends BaseController {
 
+    @ApiOperation("查询用户列表")
     @GetMapping
     @NeedLogin
     Result list(@ModelAttribute @Valid UserFindDTO userFindDTO) {
         return ResultGenerator.genSuccessResult(accountService.list(userFindDTO));
+    }
+
+    @ApiOperation("查询用户余额信息")
+    @GetMapping("{id}/balance")
+    @NeedLogin
+    Result balance(@PathVariable BigInteger id) {
+        return ResultGenerator.genSuccessResult(accountService.balance(id));
     }
 
     @GetMapping("{id}")
@@ -40,12 +46,6 @@ public class AccountController extends BaseController {
     @NeedLogin
     Result<AccountVO> get(@RequestParam String username) {
         return ResultGenerator.genSuccessResult(accountService.getByUserName(username));
-    }
-
-    @GetMapping("{id}/balance")
-    @NeedLogin
-    Result balance(@PathVariable BigInteger id) {
-        return ResultGenerator.genSuccessResult(accountService.balance(id));
     }
 
     @PostMapping

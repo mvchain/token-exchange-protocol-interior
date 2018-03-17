@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class BeanUtil {
 
-    public static PageInfo beanList2VOList (List<? extends Object> list , Class targetClass) {
+    public static PageInfo beanList2VOList(List<? extends Object> list, Class targetClass) {
         List<Object> retult = list.stream().map(account1 -> {
             Object instance = null;
             try {

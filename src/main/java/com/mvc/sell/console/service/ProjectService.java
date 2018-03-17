@@ -167,6 +167,12 @@ public class ProjectService extends BaseService {
         orders.setProjectId(buyDTO.getProjectId());
         orders.setTokenNumber(balance);
         orderMapper.insert(orders);
+        // update order number
+        Account account = accountService.getAccount(getUserId());
+        Integer orderNum = account.getOrderNum();
+        orderNum = null == orderNum ? 1 : orderNum++;
+        account.setOrderNum(orderNum);
+        accountService.update(account);
     }
 
     public WithdrawInfoVO getWithdrawConfig(String tokenName) {
@@ -242,5 +248,62 @@ public class ProjectService extends BaseService {
         project.setContractAddress(contractAddress);
         return projectMapper.selectOne(project);
 
+    }
+
+    public Integer updateStatus() {
+        Integer number = 0;
+        number = number + projectMapper.updateStart();
+        number = number + projectMapper.updateFinish();
+        return number;
+    }
+
+    public void updateShow(BigInteger id, Integer show) {
+        Project project = new Project();
+        project.setId(id);
+        project.setShow(show);
+        projectMapper.updateByPrimaryKeySelective(project);
+    }
+
+    public void delete(BigInteger id) {
+        Project project = getNotNullById(id);
+        Boolean canDelete = project.getStatus().equals(0) || project.getSendToken().equals(1);
+        Assert.isTrue(canDelete, MessageConstants.CANNOT_DELETE);
+        projectMapper.delete(project);
+        configService.deleteByProjectId(project.getId());
+    }
+
+    private Project getNotNullById(BigInteger id) {
+        Project project = new Project();
+        project.setId(id);
+        project = projectMapper.selectByPrimaryKey(project);
+        // 项目开始前或项目发币后可用
+        Assert.notNull(project, MessageConstants.PROJECT_NOT_EXIST);
+        return project;
+    }
+
+    public void sendToken(BigInteger id, Integer sendToken) {
+        Project project = getNotNullById(id);
+        // 当前未发币且项目结束后可用
+        Boolean canSend = project.getStatus().equals(2) && project.getSendToken() == 0;
+        Assert.isTrue(canSend, MessageConstants.CANNOT_SEND_TOKEN);
+        project.setSendToken(1);
+        projectMapper.updateByPrimaryKeySelective(project);
+    }
+
+    public void retire(BigInteger id, Integer retire) {
+        Project project = getNotNullById(id);
+        // 项目结束后可用, 使用一次此功能后或此项目代币开放提币后禁用
+        Config config = configService.getByPorjectId(project.getId());
+        Boolean canRetire = project.getStatus().equals(2) && project.getRetire().equals(0) && config.getRechargeStatus().equals(0);
+        Assert.isTrue(canRetire, MessageConstants.CANNOT_RETIRE);
+        project.setRetire(1);
+        projectMapper.updateByPrimaryKeySelective(project);
+    }
+
+    public Project getByTokenId(BigInteger tokenId) {
+        Config config = configService.getByTokenId(tokenId);
+        Project project = new Project();
+        project.setId(config.getProjectId());
+        return projectMapper.selectByPrimaryKey(project);
     }
 }

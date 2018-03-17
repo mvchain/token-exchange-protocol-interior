@@ -14,4 +14,9 @@ public interface MessageConstants {
     String TITLE_EMPTY = "请填写项目标题！";
     String ETH_MIN = "购买数量过小";
     String ADDERSS_ERROR = "地址错误或不存在";
+    String CANNOT_DELETE = "不能删除";
+    String CANNOT_SEND_TOKEN = "不能发币";
+    String PROJECT_NOT_EXIST = "项目不存在";
+    String CANNOT_RETIRE = "不能清退";
+    String CANNOT_CANCEL = "不能取消";
 }

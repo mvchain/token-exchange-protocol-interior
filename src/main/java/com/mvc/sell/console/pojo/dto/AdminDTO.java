@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @create 2018/3/12 14:43
  */
 @Data
-public class AdminDTO implements Serializable{
+public class AdminDTO implements Serializable {
     private static final long serialVersionUID = -1840405735682750834L;
 
     @NotNull(message = MessageConstants.USERNAME_EMPTY)

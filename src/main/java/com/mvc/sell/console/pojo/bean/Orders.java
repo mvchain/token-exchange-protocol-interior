@@ -2,7 +2,6 @@ package com.mvc.sell.console.pojo.bean;
 
 import lombok.Data;
 
-import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;

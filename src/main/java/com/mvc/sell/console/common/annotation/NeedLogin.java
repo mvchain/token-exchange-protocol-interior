@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
  * @create 2018/3/10 17:30
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value={ElementType.METHOD,ElementType.TYPE})
+@Target(value = {ElementType.METHOD, ElementType.TYPE})
 public @interface NeedLogin {
 }

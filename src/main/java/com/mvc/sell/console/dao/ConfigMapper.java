@@ -1,7 +1,6 @@
 package com.mvc.sell.console.dao;
 
 import com.mvc.sell.console.pojo.bean.Config;
-import com.mvc.sell.console.pojo.vo.ConfigVO;
 import org.apache.ibatis.annotations.Select;
 import tk.mybatis.mapper.common.Mapper;
 

@@ -1,6 +1,5 @@
 package com.mvc.sell.console.service;
 
-import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.bean.Capital;
@@ -27,7 +26,7 @@ public class AccountService extends BaseService {
         account.setUsername(userFindDTO.getUsername());
         account.setId(userFindDTO.getId());
         List<Account> list = accountMapper.select(account);
-        return (PageInfo<AccountVO>) BeanUtil.beanList2VOList(list, AccountVO.class );
+        return (PageInfo<AccountVO>) BeanUtil.beanList2VOList(list, AccountVO.class);
     }
 
     public AccountVO get(BigInteger id) {
@@ -60,5 +59,11 @@ public class AccountService extends BaseService {
 
     public Account getNonAddress() {
         return accountMapper.getNonAddress();
+    }
+
+    public Account getAccount(BigInteger userId) {
+        Account t = new Account();
+        t.setId(userId);
+        return accountMapper.selectByPrimaryKey(t);
     }
 }

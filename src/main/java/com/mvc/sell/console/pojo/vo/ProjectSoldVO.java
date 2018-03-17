@@ -13,7 +13,7 @@ import java.math.BigInteger;
  * @create 2018/3/14 14:56
  */
 @Data
-public class ProjectSoldVO implements Serializable{
+public class ProjectSoldVO implements Serializable {
     private static final long serialVersionUID = 1185097066226411335L;
 
     private BigInteger id;

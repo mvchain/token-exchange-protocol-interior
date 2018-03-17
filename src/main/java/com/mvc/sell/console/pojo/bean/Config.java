@@ -1,11 +1,8 @@
 package com.mvc.sell.console.pojo.bean;
 
-import com.mvc.sell.console.constants.MessageConstants;
 import lombok.Data;
-import org.web3j.abi.datatypes.Int;
 
 import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Date;
 

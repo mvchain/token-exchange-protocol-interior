@@ -1,9 +1,6 @@
 package com.mvc.sell.console.service;
 
-import com.mvc.common.msg.Result;
-import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.pojo.bean.Config;
-import com.mvc.sell.console.pojo.vo.ConfigVO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -37,11 +34,29 @@ public class ConfigService extends BaseService {
 
     public Config get(BigInteger tokenId) {
         if (null == tokenId) {
-            return  null;
+            return null;
         }
         Config config = new Config();
         config.setId(tokenId);
         config.setRechargeStatus(1);
         return configMapper.selectOne(config);
+    }
+
+    public Config getByPorjectId(BigInteger id) {
+        Config config = new Config();
+        config.setProjectId(id);
+        return configMapper.selectOne(config);
+    }
+
+    public void deleteByProjectId(BigInteger id) {
+        Config config = new Config();
+        config.setProjectId(id);
+        configMapper.delete(config);
+    }
+
+    public Config getByTokenId(BigInteger tokenId) {
+        Config config = new Config();
+        config.setId(tokenId);
+        return configMapper.selectByPrimaryKey(config);
     }
 }

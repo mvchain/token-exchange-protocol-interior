@@ -1,11 +1,7 @@
 package com.mvc.sell.console.pojo.vo;
 
-import com.mvc.sell.console.common.Page;
-import com.mvc.sell.console.constants.MessageConstants;
 import lombok.Data;
 
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,4 +37,7 @@ public class ProjectVO implements Serializable {
     private Date createdAt;
     private Date updatedAt;
     private Integer decimals;
+    private Integer show;
+    private Integer sendToken;
+    private Integer retire;
 }

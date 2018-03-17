@@ -2,7 +2,6 @@ package com.mvc.sell.console.pojo.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.DecimalMin;
 import java.io.Serializable;
 import java.math.BigDecimal;
 

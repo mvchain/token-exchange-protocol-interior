@@ -9,5 +9,5 @@ import tk.mybatis.mapper.common.Mapper;
  * @author qiyichen
  * @create 2018/3/12 14:47
  */
-public interface AdminMapper extends Mapper<Admin>{
+public interface AdminMapper extends Mapper<Admin> {
 }

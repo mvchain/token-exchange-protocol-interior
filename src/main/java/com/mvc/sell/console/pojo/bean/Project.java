@@ -38,7 +38,9 @@ public class Project {
     private String description;
     private Date createdAt;
     private Date updatedAt;
-    private int status;
+    private Integer status;
     private Integer decimals;
-
+    private Integer show;
+    private Integer sendToken;
+    private Integer retire;
 }

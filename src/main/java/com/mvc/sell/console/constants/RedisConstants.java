@@ -1,7 +1,5 @@
 package com.mvc.sell.console.constants;
 
-import java.math.BigInteger;
-
 public interface RedisConstants {
 
 

@@ -6,7 +6,6 @@ import com.mvc.sell.console.common.annotation.Check;
 import com.mvc.sell.console.pojo.dto.AdminDTO;
 import com.mvc.sell.console.util.VerifyUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
@@ -29,6 +28,7 @@ public class AdminController extends BaseController {
 
     /**
      * admin login, user check annotation
+     *
      * @param adminDTO
      * @return
      */

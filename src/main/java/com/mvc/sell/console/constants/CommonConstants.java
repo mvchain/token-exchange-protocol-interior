@@ -13,5 +13,5 @@ public interface CommonConstants {
     Integer WITHDRAW = 1;
     Integer RECHARGE = 0;
     Integer STATUS_SUCCESS = 2;
-    Integer ERROR =  9;
+    Integer ERROR = 9;
 }

@@ -5,7 +5,6 @@ import com.mvc.common.context.BaseContextHandler;
 import com.mvc.sell.console.common.annotation.Check;
 import com.mvc.sell.console.common.annotation.NeedLogin;
 import com.mvc.sell.console.common.exception.CheckeException;
-import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.util.JwtHelper;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import org.web3j.abi.datatypes.Int;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;

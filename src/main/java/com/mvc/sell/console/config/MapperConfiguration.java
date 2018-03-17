@@ -11,7 +11,7 @@ import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 
 /**
  * mybatis mapper 扫描配置类
- * 
+ *
  * @author wanghaobin
  * @date 2016年12月15日
  * @since 1.7
@@ -25,7 +25,7 @@ public class MapperConfiguration implements EnvironmentAware {
     private String basePackage;
 
     @Bean
-    public MapperScannerConfigurer mapperScannerConfigurer(Environment environment){
+    public MapperScannerConfigurer mapperScannerConfigurer(Environment environment) {
 
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactory");

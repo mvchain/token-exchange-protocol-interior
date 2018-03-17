@@ -5,17 +5,23 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint8;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
 import org.web3j.quorum.Quorum;
+import org.web3j.quorum.methods.request.PrivateTransaction;
 import org.web3j.quorum.tx.ClientTransactionManager;
 import org.web3j.tx.TransactionManager;
+import org.web3j.utils.Numeric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -109,6 +115,14 @@ public class ContractService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public EthSendTransaction eth_sendTransaction(org.web3j.protocol.core.methods.request.Transaction transaction, String contractAddress) throws Exception {
+        org.web3j.abi.datatypes.Function function = new org.web3j.abi.datatypes.Function("transfer", Arrays.<Type>asList(new Address(transaction.getTo()), new Uint256(Numeric.decodeQuantity(transaction.getValue()))), Collections.<TypeReference<?>>emptyList());
+        String data = FunctionEncoder.encode(function);
+        PrivateTransaction privateTransaction = new PrivateTransaction(transaction.getFrom(), null, GAS_LIMIT.divide(BigInteger.valueOf(30)), contractAddress, BigInteger.ZERO, data, Arrays.asList(transaction.getFrom(), transaction.getTo(), contractAddress));
+        EthSendTransaction response = quorum.ethSendTransaction(privateTransaction).send();
+        return response;
     }
 
     public long decimals(String contractAddress) {

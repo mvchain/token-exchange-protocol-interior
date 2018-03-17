@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -79,7 +78,7 @@ public class JwtHelper {
         }
         if (uri.indexOf("/refresh") > 0 && !"refresh".equalsIgnoreCase(type)) {
             throw new LoginException("token type is wrong");
-        } else if (uri.indexOf("/refresh") < 0 && !"token".equalsIgnoreCase(type)){
+        } else if (uri.indexOf("/refresh") < 0 && !"token".equalsIgnoreCase(type)) {
             throw new LoginException("token type is wrong");
         }
     }

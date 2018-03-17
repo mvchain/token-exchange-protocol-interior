@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
 
 /**
  * Project dto
@@ -13,7 +12,7 @@ import java.util.Date;
  * @create 2018/3/13 18:12
  */
 @Data
-public class ProjectDTO implements Serializable{
+public class ProjectDTO implements Serializable {
 
     private static final long serialVersionUID = -4469141542284477495L;
     private BigInteger id;

@@ -13,7 +13,7 @@ import java.util.List;
  * @author qiyichen
  * @create 2018/3/13 11:57
  */
-public interface OrderMapper extends Mapper<Orders>{
+public interface OrderMapper extends Mapper<Orders> {
 
     @Select("SELECT id FROM orders WHERE user_id = #{userId} GROUP BY project_id")
     List<BigInteger> getUserProject(BigInteger userId);

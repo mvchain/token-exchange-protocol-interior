@@ -5,20 +5,25 @@ import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.bean.Config;
+import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.bean.Transaction;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
+import com.mvc.sell.console.service.ethernum.ContractService;
 import com.mvc.sell.console.util.BeanUtil;
 import com.mvc.sell.console.util.Web3jUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.admin.methods.response.NewAccountIdentifier;
+import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import rx.functions.Action1;
 
 import java.io.IOException;
@@ -48,6 +53,10 @@ public class TransactionService extends BaseService {
     ConfigService configService;
     @Value("${wallet.password}")
     String password;
+    @Value("${wallet.user}")
+    String defaultUser;
+    @Autowired
+    ContractService contractService;
 
     private BigDecimal TOKEN_TRANS_LIMIT = new BigDecimal(1000);
     private BigDecimal ETH_TRANS_LIMIT = new BigDecimal(10);
@@ -58,11 +67,63 @@ public class TransactionService extends BaseService {
         return (PageInfo<TransactionVO>) BeanUtil.beanList2VOList(list, TransactionVO.class);
     }
 
-    public void approval(BigInteger id, Integer status) {
+    public void approval(BigInteger id, Integer status) throws Exception {
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setStatus(status);
         transactionMapper.updateByPrimaryKeySelective(transaction);
+        setBalance(id, status);
+        // 发起提币
+        sendValue(id, status);
+    }
+
+    private void setBalance(BigInteger id, Integer status) {
+        if (status.equals(9)) {
+            Transaction transaction = new Transaction();
+            transaction.setId(id);
+            transaction = transactionMapper.selectByPrimaryKey(transaction);
+            capitalMapper.updateBalance(getUserId(), transaction.getTokenId(), transaction.getNumber());
+        }
+    }
+
+    private void sendValue(BigInteger id, Integer status) throws Exception {
+        if (status.equals(1)) {
+            Transaction transaction = new Transaction();
+            transaction.setId(id);
+            transaction = transactionMapper.selectByPrimaryKey(transaction);
+            String contractAddress = null;
+            BigInteger value = Web3jUtil.getWei(transaction.getRealNumber(), transaction.getTokenId(), redisTemplate);
+            if (!transaction.getTokenId().equals(0)) {
+                Project project = projectService.getByTokenId(transaction.getTokenId());
+                contractAddress = project.getContractAddress();
+            }
+            sendTransaction(transaction.getToAddress(), contractAddress, value);
+        }
+    }
+
+    private void sendTransaction(String toAddress, String contractAddress, BigInteger realNumber) throws Exception {
+        PersonalUnlockAccount flag = admin.personalUnlockAccount(defaultUser, password).send();
+        Assert.isTrue(flag.accountUnlocked(), "unlock error");
+        org.web3j.protocol.core.methods.request.Transaction transaction = new org.web3j.protocol.core.methods.request.Transaction(
+                defaultUser,
+                null,
+                null,
+                null,
+                toAddress,
+                realNumber,
+                null
+        );
+        EthSendTransaction result = null;
+        if (null == contractAddress) {
+            // send eth
+            admin.personalUnlockAccount(defaultUser, password);
+            result = web3j.ethSendTransaction(transaction).send();
+        } else {
+            // send token
+            result = contractService.eth_sendTransaction(transaction, contractAddress);
+        }
+        Assert.isTrue(result != null && !result.hasError(), null == result ? "发送失败" : result.getError().getMessage());
+        redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + result.getTransactionHash(), 1);
     }
 
     public void startListen() {
