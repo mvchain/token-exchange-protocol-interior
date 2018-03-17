@@ -3,6 +3,7 @@ package com.mvc.sell.console.service;
 import com.github.pagehelper.PageInfo;
 import com.mvc.common.context.BaseContextHandler;
 import com.mvc.sell.console.constants.CommonConstants;
+import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.pojo.bean.*;
 import com.mvc.sell.console.pojo.dto.BuyDTO;
@@ -14,9 +15,11 @@ import com.mvc.sell.console.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,12 +48,28 @@ public class ProjectService extends BaseService {
         config.setProjectId(project.getId());
         config.setTokenName(project.getTokenName());
         configService.insert(config);
+        setUnit(config.getId(), project.getDecimals());
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(project.getId());
         projectSold.setBuyerNum(0);
         projectSold.setSendToken(BigDecimal.ZERO);
         projectSold.setSoldEth(BigDecimal.ZERO);
         tokenSoldMapper.insert(projectSold);
+    }
+
+    public static void main(String[] args) {
+        Arrays.stream(Convert.Unit.values()).forEach(obj -> System.out.println(obj.getWeiFactor().toString().length() - 1));
+    }
+
+    private void setUnit(BigInteger id, Integer decimals) {
+        Arrays.stream(Convert.Unit.values()).forEach(obj -> {
+                    int value = obj.getWeiFactor().toString().length() - 1;
+                    if (decimals == value) {
+                        redisTemplate.opsForValue().set(RedisConstants.UNIT + "#" + id, obj);
+
+                    }
+                }
+        );
     }
 
     public void update(ProjectDTO projectDTO) {
@@ -151,10 +170,7 @@ public class ProjectService extends BaseService {
     }
 
     public WithdrawInfoVO getWithdrawConfig(String tokenName) {
-        Config config = new Config();
-        config.setTokenName(tokenName);
-        config.setNeedShow(1);
-        config = configMapper.selectOne(config);
+        Config config = getConfig(tokenName);
         Assert.notNull(config, CommonConstants.TOKEN_ERR);
         WithdrawInfoVO withdrawInfoVO = (WithdrawInfoVO) BeanUtil.copyProperties(config, new WithdrawInfoVO());
         Capital capital = new Capital();
@@ -164,30 +180,17 @@ public class ProjectService extends BaseService {
         withdrawInfoVO.setBalance(null == capital ? BigDecimal.ZERO : capital.getBalance());
         String key = RedisConstants.TODAY_USER + "#" + tokenName + "#" + getUserId();
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
-        withdrawInfoVO.setTodayUse(null == use?BigDecimal.ZERO: use);
+        withdrawInfoVO.setTodayUse(null == use ? BigDecimal.ZERO : use);
         return withdrawInfoVO;
     }
 
     public void withdraw(WithdrawDTO withdrawDTO) {
         // check
-        AccountVO account = accountService.get(getUserId());
-        Assert.isTrue(null != account && account.getTransactionPassword().equalsIgnoreCase(withdrawDTO.getTransactionPassword()), CommonConstants.USER_PWD_ERR);
-        Config config = new Config();
-        config.setTokenName(withdrawDTO.getTokenName());
-        config.setNeedShow(1);
-        config = configMapper.selectOne(config);
+        checkAccount(withdrawDTO);
+        Config config = getConfig(withdrawDTO.getTokenName());
         Assert.notNull(config, CommonConstants.TOKEN_ERR);
-        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
-        BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
-        use = null == use?BigDecimal.ZERO: use;
-        Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) > 0;
-        Assert.isTrue(canWithdraw, CommonConstants.NOT_ENOUGH);
-        Capital capital = new Capital();
-        capital.setTokenId(config.getId());
-        capital.setUserId(getUserId());
-        capital = capitalMapper.selectOne(capital);
-        Assert.isTrue(null != capital && capital.getBalance().compareTo(withdrawDTO.getNumber()) > 0, CommonConstants.ETH_NOT_ENOUGH);
-        capitalMapper.updateBalance(getUserId(), config.getId(), withdrawDTO.getNumber());
+        checkCanWithdraw(withdrawDTO, config);
+        checkEthBalance(withdrawDTO, config);
         // add trans
         Transaction transaction = new Transaction();
         transaction.setStatus(0);
@@ -199,5 +202,45 @@ public class ProjectService extends BaseService {
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
         transactionMapper.insert(transaction);
+        capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.multiply(withdrawDTO.getNumber()));
+    }
+
+    private void checkEthBalance(WithdrawDTO withdrawDTO, Config config) {
+        Capital capital = new Capital();
+        capital.setTokenId(config.getId());
+        capital.setUserId(getUserId());
+        capital = capitalMapper.selectOne(capital);
+        Assert.isTrue(null != capital && capital.getBalance().compareTo(withdrawDTO.getNumber()) > 0, CommonConstants.ETH_NOT_ENOUGH);
+    }
+
+    private void checkCanWithdraw(WithdrawDTO withdrawDTO, Config config) {
+        String addressKey = RedisConstants.LISTEN_ETH_ADDR + "#" + withdrawDTO.getAddress();
+        // 不能提现到临时地址
+        Assert.isTrue(!redisTemplate.hasKey(addressKey), MessageConstants.ADDERSS_ERROR);
+        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
+        BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
+        use = null == use ? BigDecimal.ZERO : use;
+        Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) > 0;
+        Assert.isTrue(canWithdraw, CommonConstants.NOT_ENOUGH);
+    }
+
+    private Config getConfig(String tokenName) {
+        Config config = new Config();
+        config.setTokenName(tokenName);
+        config.setNeedShow(1);
+        config = configMapper.selectOne(config);
+        return config;
+    }
+
+    private void checkAccount(WithdrawDTO withdrawDTO) {
+        AccountVO account = accountService.get(getUserId());
+        Assert.isTrue(null != account && account.getTransactionPassword().equalsIgnoreCase(withdrawDTO.getTransactionPassword()), CommonConstants.USER_PWD_ERR);
+    }
+
+    public Project getByContractAddress(String contractAddress) {
+        Project project = new Project();
+        project.setContractAddress(contractAddress);
+        return projectMapper.selectOne(project);
+
     }
 }

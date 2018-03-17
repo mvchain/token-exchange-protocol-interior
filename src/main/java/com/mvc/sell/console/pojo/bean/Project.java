@@ -39,5 +39,6 @@ public class Project {
     private Date createdAt;
     private Date updatedAt;
     private int status;
+    private Integer decimals;
 
 }

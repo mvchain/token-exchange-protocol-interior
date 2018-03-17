@@ -58,4 +58,7 @@ public class AccountService extends BaseService {
         accountMapper.updateByPrimaryKeySelective(account);
     }
 
+    public Account getNonAddress() {
+        return accountMapper.getNonAddress();
+    }
 }

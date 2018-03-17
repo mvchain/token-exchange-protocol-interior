@@ -58,19 +58,6 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
             Boolean isFeign = "feign".equalsIgnoreCase(request.getHeader("type"));
             JwtHelper.check(claim, uri, isFeign);
         }
-        // check condition
-        if (null != checkAnn) {
-            for (String type : checkAnn.type()) {
-                String valiCode = getCode(request, type + "Code");
-                String username = claim.get("username", String.class);
-                String code = (String) redisTemplate.opsForValue().get(type + "Check" + username);
-                if (null == valiCode || !valiCode.equalsIgnoreCase(code)) {
-                    throw new CheckeException(type + " is wrong");
-                } else {
-                    redisTemplate.delete(type + "Check" + username);
-                }
-            }
-        }
     }
 
     private String getCode(HttpServletRequest request, String key) {

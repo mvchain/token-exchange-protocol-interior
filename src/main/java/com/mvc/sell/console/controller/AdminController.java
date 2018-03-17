@@ -4,13 +4,18 @@ import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.Check;
 import com.mvc.sell.console.pojo.dto.AdminDTO;
+import com.mvc.sell.console.util.VerifyUtil;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
 /**
  * admin controller
@@ -27,10 +32,26 @@ public class AdminController extends BaseController {
      * @param adminDTO
      * @return
      */
+    @ApiOperation("管理员登录")
     @PostMapping
     @Check(type = {"image"})
-    Result login(@RequestBody @Valid AdminDTO adminDTO) {
+    Result login(@RequestBody @Valid AdminDTO adminDTO, HttpSession session) throws IllegalAccessException {
+        check(session.getId(), "image", adminDTO.getImageCode());
         return ResultGenerator.genSuccessResult(adminService.login(adminDTO));
+    }
+
+    @ApiOperation("获取图片验证码, 注意session, 不同服务session注意分离")
+    @GetMapping(value = "/validate/image", produces = "image/png")
+    public void codeImage(HttpServletResponse response, HttpSession session) throws Exception {
+        Object[] objs = VerifyUtil.createImage();
+        //将图片输出给浏览器
+        BufferedImage image = (BufferedImage) objs[1];
+        response.setContentType("image/png");
+        OutputStream os = response.getOutputStream();
+        ImageIO.write(image, "png", os);
+        String key = "imageCheck" + session.getId();
+        redisTemplate.opsForValue().set(key, objs[0]);
+        redisTemplate.expire(key, 2, TimeUnit.MINUTES);
     }
 
 }

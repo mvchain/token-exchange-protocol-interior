@@ -13,4 +13,5 @@ public interface MessageConstants {
     String TOKEN_EMPTY = "币种名称不能为空";
     String TITLE_EMPTY = "请填写项目标题！";
     String ETH_MIN = "购买数量过小";
+    String ADDERSS_ERROR = "地址错误或不存在";
 }

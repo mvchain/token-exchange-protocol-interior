@@ -9,5 +9,9 @@ public interface CommonConstants {
     String TOKEN_ERR = "名称错误或不存在";
     String USER_PWD_ERR = "密码错误 ";
     String ORDER_WITHDRAW = "T";
+    String ORDER_RECHARGE = "C";
     Integer WITHDRAW = 1;
+    Integer RECHARGE = 0;
+    Integer STATUS_SUCCESS = 2;
+    Integer ERROR =  9;
 }
