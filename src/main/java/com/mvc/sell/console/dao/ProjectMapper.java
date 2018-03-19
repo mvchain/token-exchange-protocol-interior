@@ -22,7 +22,7 @@ import java.util.List;
 public interface ProjectMapper extends Mapper<Project> {
 
     @Select({"<script>",
-            "select * from project t1, project_sold t2 where t1.id = t2.id and show = 1",
+            "select * from project t1, project_sold t2 where t1.id = t2.id and t1.show = 1",
             "<when test=\"status!=null\">",
             "and t1.status = #{status}",
             "</when>",
