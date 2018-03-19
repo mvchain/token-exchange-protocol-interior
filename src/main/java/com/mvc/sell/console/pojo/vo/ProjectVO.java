@@ -40,4 +40,5 @@ public class ProjectVO implements Serializable {
     private Integer show;
     private Integer sendToken;
     private Integer retire;
+    private Integer status;
 }

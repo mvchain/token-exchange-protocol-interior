@@ -12,9 +12,11 @@ import com.mvc.sell.console.pojo.vo.TransactionVO;
 import com.mvc.sell.console.service.ethernum.ContractService;
 import com.mvc.sell.console.util.BeanUtil;
 import com.mvc.sell.console.util.Web3jUtil;
+import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.web3j.protocol.Web3j;
@@ -23,7 +25,9 @@ import org.web3j.protocol.admin.methods.response.NewAccountIdentifier;
 import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.tx.Contract;
 import rx.functions.Action1;
 
 import java.io.IOException;
@@ -55,8 +59,13 @@ public class TransactionService extends BaseService {
     String password;
     @Value("${wallet.user}")
     String defaultUser;
+    @Value("${wallet.eth}")
+    BigDecimal ethLimit;
     @Autowired
     ContractService contractService;
+
+    public final static BigInteger DEFAULT_GAS_PRICE = Contract.GAS_PRICE.divide(BigInteger.valueOf(5));
+    public final static BigInteger DEFAULT_GAS_LIMIT = Contract.GAS_LIMIT.divide(BigInteger.valueOf(10));
 
     private BigDecimal TOKEN_TRANS_LIMIT = new BigDecimal(1000);
     private BigDecimal ETH_TRANS_LIMIT = new BigDecimal(10);
@@ -93,22 +102,28 @@ public class TransactionService extends BaseService {
             transaction = transactionMapper.selectByPrimaryKey(transaction);
             String contractAddress = null;
             BigInteger value = Web3jUtil.getWei(transaction.getRealNumber(), transaction.getTokenId(), redisTemplate);
-            if (!transaction.getTokenId().equals(0)) {
-                Project project = projectService.getByTokenId(transaction.getTokenId());
-                contractAddress = project.getContractAddress();
-            }
-            sendTransaction(transaction.getToAddress(), contractAddress, value);
+            contractAddress = getContractAddressByTokenId(transaction);
+            sendTransaction(defaultUser, transaction.getToAddress(), contractAddress, value, true);
         }
     }
 
-    private void sendTransaction(String toAddress, String contractAddress, BigInteger realNumber) throws Exception {
-        PersonalUnlockAccount flag = admin.personalUnlockAccount(defaultUser, password).send();
+    private String getContractAddressByTokenId(Transaction transaction) {
+        String contractAddress = null;
+        if (!transaction.getTokenId().equals(0)) {
+            Project project = projectService.getByTokenId(transaction.getTokenId());
+            contractAddress = project.getContractAddress();
+        }
+        return contractAddress;
+    }
+
+    private void sendTransaction(String fromAddress, String toAddress, String contractAddress, BigInteger realNumber, Boolean listen) throws Exception {
+        PersonalUnlockAccount flag = admin.personalUnlockAccount(fromAddress, password).send();
         Assert.isTrue(flag.accountUnlocked(), "unlock error");
         org.web3j.protocol.core.methods.request.Transaction transaction = new org.web3j.protocol.core.methods.request.Transaction(
-                defaultUser,
+                fromAddress,
                 null,
-                null,
-                null,
+                DEFAULT_GAS_PRICE,
+                DEFAULT_GAS_LIMIT,
                 toAddress,
                 realNumber,
                 null
@@ -116,14 +131,15 @@ public class TransactionService extends BaseService {
         EthSendTransaction result = null;
         if (null == contractAddress) {
             // send eth
-            admin.personalUnlockAccount(defaultUser, password);
             result = web3j.ethSendTransaction(transaction).send();
         } else {
             // send token
             result = contractService.eth_sendTransaction(transaction, contractAddress);
         }
         Assert.isTrue(result != null && !result.hasError(), null == result ? "发送失败" : result.getError().getMessage());
-        redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + result.getTransactionHash(), 1);
+        if (listen) {
+            redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + result.getTransactionHash(), 1);
+        }
     }
 
     public void startListen() {
@@ -212,6 +228,49 @@ public class TransactionService extends BaseService {
         transactionMapper.insertSelective(transaction);
         // update balance
         capitalMapper.updateBalance(transaction.getUserId(), transaction.getTokenId(), transaction.getNumber());
+        // transfer balance
+        this.transferBalance(transaction);
+    }
+
+    @Async
+    public void transferBalance(Transaction transaction) {
+        try {
+            EthGetBalance result = web3j.ethGetBalance(transaction.getToAddress(), DefaultBlockParameterName.LATEST).send();
+            BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE);
+            BigInteger sendBalance = result.getBalance().subtract(needBalance);
+//            Web3jUtil.getWei(ethLimit, transaction.getTokenId(), redisTemplate)
+            if (sendGasIfNull(transaction, result, needBalance)) {
+                return;
+            }
+            String contractAddress = getContractAddressByTokenId(transaction);
+            if (!transaction.getTokenId().equals(0)) {
+                // erc20 token
+                sendBalance = contractService.balanceOf(contractAddress, transaction.getToAddress());
+            }
+            sendTransaction(transaction.getToAddress(), defaultUser, contractAddress, sendBalance, false);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    private boolean sendGasIfNull(Transaction transaction, EthGetBalance result, BigInteger needBalance) throws IOException {
+        if (!result.hasError() && result.getBalance().compareTo(BigInteger.ZERO) == 0) {
+            org.web3j.protocol.core.methods.request.Transaction trans = new org.web3j.protocol.core.methods.request.Transaction(
+                    defaultUser,
+                    null,
+                    DEFAULT_GAS_PRICE,
+                    DEFAULT_GAS_LIMIT,
+                    transaction.getToAddress(),
+                    needBalance,
+                    null
+            );
+            admin.personalUnlockAccount(defaultUser, password);
+            web3j.ethSendTransaction(trans).send();
+            redisTemplate.opsForList().leftPush(RedisConstants.GAS_QUENE, transaction);
+            return true;
+        }
+        ;
+        return false;
     }
 
     private BigInteger getTokenId(org.web3j.protocol.core.methods.response.Transaction tx) {
@@ -255,5 +314,15 @@ public class TransactionService extends BaseService {
             num++;
         }
         return num;
+    }
+
+    public Integer sendGas() {
+        Integer number = 0;
+        while (redisTemplate.opsForList().size( RedisConstants.GAS_QUENE) > 0) {
+            Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(RedisConstants.GAS_QUENE);
+            transferBalance(transaction);
+            number++;
+        }
+        return number;
     }
 }

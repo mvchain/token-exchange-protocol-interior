@@ -32,5 +32,11 @@ public class EthJob {
         }
     }
 
-
+    @Scheduled(cron = "*/30 * * * * ?")
+    public void sendGas() throws IOException {
+        Integer num = transactionService.sendGas();
+        if (num > 0) {
+            log.info(String.format("%s address send gas ", num));
+        }
+    }
 }

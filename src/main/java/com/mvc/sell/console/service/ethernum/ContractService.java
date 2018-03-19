@@ -1,15 +1,21 @@
 package com.mvc.sell.console.service.ethernum;
 
+import com.mvc.sell.console.pojo.bean.Transaction;
+import com.mvc.sell.console.service.TransactionService;
+import com.mvc.sell.console.util.Web3jUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint8;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
@@ -275,9 +281,6 @@ public class ContractService {
             return new TransactionResponse<>(
                     transactionReceipt.getTransactionHash());
         }
-    }
-
-    public void transfer() {
     }
 
     @Data

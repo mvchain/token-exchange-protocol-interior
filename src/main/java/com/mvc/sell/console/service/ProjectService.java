@@ -159,6 +159,16 @@ public class ProjectService extends BaseService {
         Integer result = capitalMapper.updateEth(getUserId(), buyDTO.getEthNumber());
         Assert.isTrue(result > 0, CommonConstants.ETH_NOT_ENOUGH);
         // add order
+        addOrder(buyDTO, balance);
+        // update order number
+        Account account = accountService.getAccount(getUserId());
+        Integer orderNum = account.getOrderNum();
+        orderNum = null == orderNum ? 1 : orderNum++;
+        account.setOrderNum(orderNum);
+        accountService.update(account);
+    }
+
+    private void addOrder(BuyDTO buyDTO, BigDecimal balance) {
         Orders orders = new Orders();
         orders.setUserId(getUserId());
         orders.setEthNumber(buyDTO.getEthNumber());
@@ -167,12 +177,15 @@ public class ProjectService extends BaseService {
         orders.setProjectId(buyDTO.getProjectId());
         orders.setTokenNumber(balance);
         orderMapper.insert(orders);
-        // update order number
-        Account account = accountService.getAccount(getUserId());
-        Integer orderNum = account.getOrderNum();
-        orderNum = null == orderNum ? 1 : orderNum++;
-        account.setOrderNum(orderNum);
-        accountService.update(account);
+        updateSold(buyDTO.getProjectId(), buyDTO.getEthNumber(), balance);
+
+    }
+
+    private void updateSold(BigInteger projectId, BigDecimal ethNumber, BigDecimal balance) {
+        ProjectSold projectSold = new ProjectSold();
+        projectSold.setId(projectId);
+        projectSold.setSoldEth(ethNumber);
+        projectMapper.updateSolePalance(projectSold);
     }
 
     public WithdrawInfoVO getWithdrawConfig(String tokenName) {
