@@ -21,13 +21,13 @@ import java.math.BigInteger;
 @RequestMapping("order")
 public class OrderController extends BaseController {
 
-    @ApiOperation("查询订单")
+    @ApiOperation("查询订单.status: 取消 = 9, 默认0,已发币2,已清退4")
     @GetMapping
     Result<PageInfo<OrderVO>> list(@ModelAttribute @Valid OrderDTO orderDTO) {
         return ResultGenerator.genSuccessResult(orderService.list(orderDTO));
     }
 
-    @ApiOperation("更新订单状态, 取消 = 9, 默认0, 已发币为2")
+    @ApiOperation("取消订单9,目前手动传入方便后续扩展")
     @PutMapping("{id}/orderStatus/{orderStatus}")
     Result updateStatus(@PathVariable BigInteger orderId, @PathVariable Integer orderStatus) {
         orderService.updateStatus(orderId, orderStatus);

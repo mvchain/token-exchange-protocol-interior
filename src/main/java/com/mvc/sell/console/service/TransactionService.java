@@ -3,16 +3,12 @@ package com.mvc.sell.console.service;
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.RedisConstants;
-import com.mvc.sell.console.pojo.bean.Account;
-import com.mvc.sell.console.pojo.bean.Config;
-import com.mvc.sell.console.pojo.bean.Project;
-import com.mvc.sell.console.pojo.bean.Transaction;
+import com.mvc.sell.console.pojo.bean.*;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import com.mvc.sell.console.service.ethernum.ContractService;
 import com.mvc.sell.console.util.BeanUtil;
 import com.mvc.sell.console.util.Web3jUtil;
-import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +30,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * TransactionService
@@ -318,11 +315,12 @@ public class TransactionService extends BaseService {
 
     public Integer sendGas() {
         Integer number = 0;
-        while (redisTemplate.opsForList().size( RedisConstants.GAS_QUENE) > 0) {
+        while (redisTemplate.opsForList().size(RedisConstants.GAS_QUENE) > 0) {
             Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(RedisConstants.GAS_QUENE);
             transferBalance(transaction);
             number++;
         }
         return number;
     }
+
 }

@@ -14,4 +14,6 @@ public interface CommonConstants {
     Integer RECHARGE = 0;
     Integer STATUS_SUCCESS = 2;
     Integer ERROR = 9;
+    Integer ORDER_STATUS_RETIRE = 4;
+    Integer ORDER_STATUS_SEND_TOKEN = 2;
 }

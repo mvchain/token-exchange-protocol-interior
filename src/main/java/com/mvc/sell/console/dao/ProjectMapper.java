@@ -42,5 +42,5 @@ public interface ProjectMapper extends Mapper<Project> {
     Integer updateFinish();
 
     @Update("update project_sold set buyer_num = buyer_num+1, sold_eth = sold_eth + {soldEth} where id = #{id}")
-    void updateSolePalance(ProjectSold projectSold);
+    void updateSoldBalance(ProjectSold projectSold);
 }

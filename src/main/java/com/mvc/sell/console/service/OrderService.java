@@ -1,12 +1,15 @@
 package com.mvc.sell.console.service;
 
 import com.github.pagehelper.PageInfo;
+import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.MessageConstants;
+import com.mvc.sell.console.pojo.bean.Config;
 import com.mvc.sell.console.pojo.bean.Orders;
 import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
 import com.mvc.sell.console.pojo.vo.OrderVO;
 import com.mvc.sell.console.util.BeanUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -22,6 +25,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class OrderService extends BaseService {
+
+    @Autowired
+    ConfigService configService;
 
     public void update(Orders orders) {
         orderMapper.updateByPrimaryKeySelective(orders);
@@ -49,5 +55,13 @@ public class OrderService extends BaseService {
         Assert.isTrue(orders.getOrderStatus() == 0, MessageConstants.CANNOT_CANCEL);
         orders.setOrderStatus(orderStatus);
         orderMapper.updateByPrimaryKeySelective(orders);
+
+        Config config = configService.getByPorjectId(orders.getProjectId());
+        tokenSoldMapper.updateEth(orders.getProjectId(), orders.getEthNumber());
+
+    }
+
+    public void updateStatusByProject(BigInteger id, Integer orderStatusRetire) {
+        orderMapper.updateStatusByProject(id, orderStatusRetire);
     }
 }

@@ -39,4 +39,5 @@ public class EthJob {
             log.info(String.format("%s address send gas ", num));
         }
     }
+
 }

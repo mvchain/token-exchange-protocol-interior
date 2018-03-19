@@ -13,4 +13,5 @@ public interface RedisConstants {
     String UNIT = "UNIT";
     String LAST_BOLCK_NUMBER = "LAST_BOLCK_NUMBER";
     String GAS_QUENE = "GAS_QUENE";
+    String ORDER_LOCK = "ORDER_LOCK";
 }

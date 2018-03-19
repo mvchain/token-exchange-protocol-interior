@@ -35,6 +35,8 @@ public class ProjectService extends BaseService {
     ConfigService configService;
     @Autowired
     AccountService accountService;
+    @Autowired
+    OrderService orderService;
 
     public PageInfo<ProjectVO> list() {
         List<Project> list = projectMapper.selectAll();
@@ -178,14 +180,13 @@ public class ProjectService extends BaseService {
         orders.setTokenNumber(balance);
         orderMapper.insert(orders);
         updateSold(buyDTO.getProjectId(), buyDTO.getEthNumber(), balance);
-
     }
 
     private void updateSold(BigInteger projectId, BigDecimal ethNumber, BigDecimal balance) {
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(projectId);
         projectSold.setSoldEth(ethNumber);
-        projectMapper.updateSolePalance(projectSold);
+        projectMapper.updateSoldBalance(projectSold);
     }
 
     public WithdrawInfoVO getWithdrawConfig(String tokenName) {
@@ -301,6 +302,7 @@ public class ProjectService extends BaseService {
         Assert.isTrue(canSend, MessageConstants.CANNOT_SEND_TOKEN);
         project.setSendToken(1);
         projectMapper.updateByPrimaryKeySelective(project);
+        orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_SEND_TOKEN);
     }
 
     public void retire(BigInteger id, Integer retire) {
@@ -311,6 +313,7 @@ public class ProjectService extends BaseService {
         Assert.isTrue(canRetire, MessageConstants.CANNOT_RETIRE);
         project.setRetire(1);
         projectMapper.updateByPrimaryKeySelective(project);
+        orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_RETIRE);
     }
 
     public Project getByTokenId(BigInteger tokenId) {
@@ -318,5 +321,9 @@ public class ProjectService extends BaseService {
         Project project = new Project();
         project.setId(config.getProjectId());
         return projectMapper.selectByPrimaryKey(project);
+    }
+
+    public List<Project> select(Project project) {
+        return projectMapper.select(project);
     }
 }
