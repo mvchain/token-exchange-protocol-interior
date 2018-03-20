@@ -22,14 +22,14 @@ import java.util.List;
 public interface ProjectMapper extends Mapper<Project> {
 
     @Select({"<script>",
-            "select * from project t1, project_sold t2 where t1.id = t2.id and t1.show = 1",
+            "select * from project t1, project_sold t2 where t1.id = t2.id and t1.need_show = 1",
             "<when test=\"status!=null\">",
             "and t1.status = #{status}",
             "</when>",
             "</script>"})
     List<MyProjectVO> listDetail(MyProjectDTO myProjectDTO);
 
-    @Select("select * from project t1, project_sold t2 where t1.id = t2.id and t1.id = #{id} and t1.show = 1")
+    @Select("select * from project t1, project_sold t2 where t1.id = t2.id and t1.id = #{id} and t1.need_show = 1")
     MyProjectVO detail(MyProjectDTO myProjectDTO);
 
     @Select("SELECT (SELECT IFNULL(balance,0) FROM capital WHERE user_id = #{userId} and token_id = 0) eth_balance, ratio, id project_id, token_name FROM project WHERE id = #{id}")
