@@ -274,7 +274,7 @@ public class ProjectService extends BaseService {
     public void updateShow(BigInteger id, Integer show) {
         Project project = new Project();
         project.setId(id);
-        project.setShow(show);
+        project.setNeedShow(show);
         projectMapper.updateByPrimaryKeySelective(project);
     }
 

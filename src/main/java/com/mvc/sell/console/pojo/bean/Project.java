@@ -43,7 +43,7 @@ public class Project {
     private Date updatedAt;
     private Integer status;
     private Integer decimals;
-    private Integer show;
+    private Integer needShow;
     private Integer sendToken;
     private Integer retire;
 }

@@ -40,7 +40,7 @@ public class ProjectVO implements Serializable {
     private Date createdAt;
     private Date updatedAt;
     private Integer decimals;
-    private Integer show;
+    private Integer needShow;
     private Integer sendToken;
     private Integer retire;
     private Integer status;
