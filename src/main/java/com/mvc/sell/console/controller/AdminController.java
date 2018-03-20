@@ -40,6 +40,12 @@ public class AdminController extends BaseController {
         return ResultGenerator.genSuccessResult(adminService.login(adminDTO));
     }
 
+    @PostMapping("token/refresh")
+    @ApiOperation("刷新令牌")
+    Result refresh() {
+        return ResultGenerator.genSuccessResult(adminService.refresh());
+    }
+
     @ApiOperation("获取图片验证码, 注意session, 不同服务session注意分离")
     @GetMapping(value = "/validate/image", produces = "image/png")
     public void codeImage(HttpServletResponse response, HttpSession session) throws Exception {

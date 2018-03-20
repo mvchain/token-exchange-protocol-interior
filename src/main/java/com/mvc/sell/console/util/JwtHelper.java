@@ -1,5 +1,7 @@
 package com.mvc.sell.console.util;
 
+import com.mvc.common.exception.auth.TokenErrorException;
+import com.mvc.sell.console.constants.MessageConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -79,7 +81,7 @@ public class JwtHelper {
         if (uri.indexOf("/refresh") > 0 && !"refresh".equalsIgnoreCase(type)) {
             throw new LoginException("token type is wrong");
         } else if (uri.indexOf("/refresh") < 0 && !"token".equalsIgnoreCase(type)) {
-            throw new LoginException("token type is wrong");
+            throw new TokenErrorException(MessageConstants.TOKEN_EXPIRE, MessageConstants.TOKEN_EXPIRE_CODE);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.mvc.sell.console.service;
 
+import com.mvc.common.context.BaseContextHandler;
 import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
@@ -9,6 +10,8 @@ import com.mvc.sell.console.pojo.vo.TokenVO;
 import com.mvc.sell.console.util.JwtHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.math.BigInteger;
 
 /**
  * admin service
@@ -32,6 +35,12 @@ public class AdminService extends BaseService {
         String token = JwtHelper.createToken(username, admin.getId());
         String refreshToken = JwtHelper.createRefresh(username, admin.getId());
         return new TokenVO(token, refreshToken);
+    }
+
+    public String refresh() {
+        BigInteger userId = (BigInteger) BaseContextHandler.get("userId");
+        String username = (String) BaseContextHandler.get("username");
+        return JwtHelper.createToken(username, userId);
     }
 
 }

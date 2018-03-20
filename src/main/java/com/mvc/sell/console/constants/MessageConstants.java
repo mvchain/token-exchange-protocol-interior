@@ -19,4 +19,7 @@ public interface MessageConstants {
     String PROJECT_NOT_EXIST = "项目不存在";
     String CANNOT_RETIRE = "不能清退";
     String CANNOT_CANCEL = "不能取消";
+    String TOKEN_EXPIRE = "令牌已过期,请刷新";
+    Integer TOKEN_EXPIRE_CODE = 50014;
+    Integer TOKEN_ERROR_CODE = 50015;
 }

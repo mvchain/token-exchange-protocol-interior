@@ -2,9 +2,11 @@ package com.mvc.sell.console.common.interceptor;
 
 import com.github.pagehelper.PageHelper;
 import com.mvc.common.context.BaseContextHandler;
+import com.mvc.common.exception.auth.TokenErrorException;
 import com.mvc.sell.console.common.annotation.Check;
 import com.mvc.sell.console.common.annotation.NeedLogin;
 import com.mvc.sell.console.common.exception.CheckeException;
+import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.util.JwtHelper;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
@@ -47,19 +49,17 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
     }
 
     private void checkAnnotation(Claims claim, NeedLogin loginAnn, Check checkAnn, String uri, HttpServletRequest request) throws LoginException, CheckeException {
-        // check login
-//        if (null == claim && null != loginAnn) {
-//            throw new LoginException(MessageConstants.TOKEN_WRONG);
-//        }
+        Boolean isFeign = "feign".equalsIgnoreCase(request.getHeader("type"));
+        if (null == claim && null != loginAnn && !isFeign) {
+            if (uri.indexOf("/refresh") > 0 ){
+                throw new LoginException(MessageConstants.TOKEN_WRONG);
+            } else {
+                throw new TokenErrorException(MessageConstants.TOKEN_EXPIRE, MessageConstants.TOKEN_EXPIRE_CODE);
+            }
+        }
         if (null != claim) {
-            Boolean isFeign = "feign".equalsIgnoreCase(request.getHeader("type"));
             JwtHelper.check(claim, uri, isFeign);
         }
-    }
-
-    private String getCode(HttpServletRequest request, String key) {
-        String code = request.getParameter(key);
-        return code;
     }
 
     public void setUserInfo(Claims userInfo) {
