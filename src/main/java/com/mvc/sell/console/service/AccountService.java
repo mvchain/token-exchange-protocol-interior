@@ -31,7 +31,7 @@ public class AccountService extends BaseService {
 
     public AccountVO get(BigInteger id) {
         Account t = new Account();
-        t.setId(BigInteger.ONE);
+        t.setId(id);
         Account account = accountMapper.selectByPrimaryKey(t);
         return (AccountVO) BeanUtil.copyProperties(account, new AccountVO());
     }
