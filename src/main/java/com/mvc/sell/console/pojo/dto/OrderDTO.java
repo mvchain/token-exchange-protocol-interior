@@ -21,5 +21,6 @@ public class OrderDTO extends Page implements Serializable {
     private BigInteger userId;
     private BigInteger projectId;
     private Integer orderStatus;
+    private Integer status;
 
 }
