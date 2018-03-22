@@ -34,9 +34,4 @@ public class TransactionController extends BaseController {
         return ResultGenerator.genSuccessResult();
     }
 
-//    @PostMapping("withdraw")
-//    Result verify(@ModelAttribute @Valid WithdrawDTO withdrawDTO) {
-//        return transactionService.verify(withdrawDTO);
-//    }
-
 }

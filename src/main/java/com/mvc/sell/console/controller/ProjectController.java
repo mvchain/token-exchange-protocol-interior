@@ -11,6 +11,7 @@ import com.mvc.sell.console.pojo.dto.WithdrawDTO;
 import com.mvc.sell.console.pojo.vo.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
@@ -93,39 +94,40 @@ public class ProjectController extends BaseController {
         projectService.delete(id);
         return ResultGenerator.genSuccessResult();
     }
-
+    @ApiIgnore
     @PutMapping("{id}/status/{status}")
     Result<ProjectVO> get(@PathVariable BigInteger id, @PathVariable Integer status) {
         projectService.updateStatus(id, status);
         return ResultGenerator.genSuccessResult();
     }
-
+    @ApiIgnore
     @GetMapping("account/{id}")
     Result<MyProjectVO> getByUser(@ModelAttribute MyProjectDTO myProjectDTO) {
         return ResultGenerator.genSuccessResult(projectService.getByUser(myProjectDTO));
     }
 
+    @ApiIgnore
     @GetMapping("account")
     Result<PageInfo<MyProjectVO>> getListByUser(@ModelAttribute MyProjectDTO myProjectDTO) {
         return ResultGenerator.genSuccessResult(projectService.getListByUser(myProjectDTO));
     }
-
+    @ApiIgnore
     @GetMapping("info/{id}")
     Result<ProjectInfoVO> info(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(projectService.info(id));
     }
-
+    @ApiIgnore
     @PostMapping("buy")
     Result buy(@RequestBody @Valid BuyDTO buyDTO) {
         projectService.buy(buyDTO);
         return ResultGenerator.genSuccessResult();
     }
-
+    @ApiIgnore
     @GetMapping("config")
     Result<WithdrawInfoVO> getWithdrawConfig(@RequestParam String tokenName) {
         return ResultGenerator.genSuccessResult(projectService.getWithdrawConfig(tokenName));
     }
-
+    @ApiIgnore
     @PostMapping("withdraw")
     Result withdraw(@RequestBody @Valid WithdrawDTO withdrawDTO) {
         projectService.withdraw(withdrawDTO);

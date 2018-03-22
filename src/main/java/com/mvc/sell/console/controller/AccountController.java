@@ -8,6 +8,7 @@ import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import com.mvc.sell.console.pojo.vo.AccountVO;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
@@ -35,25 +36,25 @@ public class AccountController extends BaseController {
     Result balance(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(accountService.balance(id));
     }
-
+    @ApiIgnore
     @GetMapping("{id}")
     @NeedLogin
     Result get(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(accountService.get(id));
     }
-
+    @ApiIgnore
     @GetMapping("username")
     @NeedLogin
     Result<AccountVO> get(@RequestParam String username) {
         return ResultGenerator.genSuccessResult(accountService.getByUserName(username));
     }
-
+    @ApiIgnore
     @PostMapping
     Result create(@RequestBody Account account) {
         accountService.create(account);
         return ResultGenerator.genSuccessResult();
     }
-
+    @ApiIgnore
     @PutMapping
     Result update(@RequestBody Account account) {
         accountService.update(account);

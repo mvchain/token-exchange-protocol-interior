@@ -6,6 +6,7 @@ import com.mvc.sell.console.common.annotation.NeedLogin;
 import com.mvc.sell.console.pojo.bean.Config;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -42,7 +43,7 @@ public class ConfigController extends BaseController {
         configService.update(config);
         return ResultGenerator.genSuccessResult();
     }
-
+    @ApiIgnore
     @GetMapping(value = "token")
     Result<List<String>> config() {
         return ResultGenerator.genSuccessResult(configService.token());
