@@ -28,9 +28,9 @@ public class AdminService extends BaseService {
         Admin admin = new Admin();
         String encrypt = encoder.encode(adminDTO.getPassword());
         admin.setUsername(username);
-        admin.setPassword(encrypt);
         admin = adminMapper.selectOne(admin);
-        Assert.notNull(admin, MessageConstants.PWD_ERR);
+        boolean result = encoder.matches(adminDTO.getPassword(), encrypt);
+        Assert.isTrue(result, MessageConstants.PWD_ERR);
         Assert.isTrue(!CommonConstants.USER_FREEZE.equals(admin.getStatus()), "用户已冻结!");
         redisTemplate.opsForValue().set(RedisConstants.USER_STATUS, admin.getStatus());
         String token = JwtHelper.createToken(username, admin.getId());
