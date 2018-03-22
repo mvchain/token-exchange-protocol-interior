@@ -17,7 +17,7 @@ import javax.security.auth.login.LoginException;
 /**
  * @author qyc
  */
-@ControllerAdvice
+@ControllerAdvice("com.mvc")
 @ResponseBody
 public class GlobalExceptionHandler {
 

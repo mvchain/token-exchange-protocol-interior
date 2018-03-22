@@ -2,9 +2,7 @@ package com.mvc.sell.console.controller;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-public class ProjectControllerTest {
+public class ProjectControllerTest extends BaseTest {
     @Test
     public void list() throws Exception {
     }

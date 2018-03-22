@@ -4,6 +4,7 @@ import com.mvc.sell.console.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 /**
  * base controller
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @author qiyichen
  * @create 2018/3/10 16:44
  */
-@Component
+@Controller
 public class BaseController {
 
     @Autowired

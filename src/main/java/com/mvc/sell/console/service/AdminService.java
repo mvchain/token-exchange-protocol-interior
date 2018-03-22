@@ -8,6 +8,7 @@ import com.mvc.sell.console.pojo.bean.Admin;
 import com.mvc.sell.console.pojo.dto.AdminDTO;
 import com.mvc.sell.console.pojo.vo.TokenVO;
 import com.mvc.sell.console.util.JwtHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 

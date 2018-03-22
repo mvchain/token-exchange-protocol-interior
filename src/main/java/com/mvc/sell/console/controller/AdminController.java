@@ -34,7 +34,6 @@ public class AdminController extends BaseController {
      */
     @ApiOperation("管理员登录")
     @PostMapping
-    @Check(type = {"image"})
     Result login(@RequestBody @Valid AdminDTO adminDTO, HttpSession session) throws IllegalAccessException {
         check(session.getId(), "image", adminDTO.getImageCode());
         return ResultGenerator.genSuccessResult(adminService.login(adminDTO));
