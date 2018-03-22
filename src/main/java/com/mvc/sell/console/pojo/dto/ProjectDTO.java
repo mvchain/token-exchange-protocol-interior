@@ -25,6 +25,7 @@ public class ProjectDTO implements Serializable {
     private Float ratio;
     private Date startTime;
     private Date stopTime;
+    private String homepage;
     private String whitePaperAddress;
     private String whitePaperName;
     private String projectImageAddress;
