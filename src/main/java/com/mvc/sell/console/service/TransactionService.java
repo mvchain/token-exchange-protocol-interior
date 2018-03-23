@@ -3,7 +3,10 @@ package com.mvc.sell.console.service;
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.RedisConstants;
-import com.mvc.sell.console.pojo.bean.*;
+import com.mvc.sell.console.pojo.bean.Account;
+import com.mvc.sell.console.pojo.bean.Config;
+import com.mvc.sell.console.pojo.bean.Project;
+import com.mvc.sell.console.pojo.bean.Transaction;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import com.mvc.sell.console.service.ethernum.ContractService;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.admin.methods.response.NewAccountIdentifier;
@@ -30,7 +34,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * TransactionService
@@ -68,6 +71,7 @@ public class TransactionService extends BaseService {
     private BigDecimal ETH_TRANS_LIMIT = new BigDecimal(10);
 
     public PageInfo<TransactionVO> transaction(TransactionDTO transactionDTO) {
+        transactionDTO.setOrderId(StringUtils.isEmpty(transactionDTO.getOrderId()) ? null : transactionDTO.getOrderId());
         Transaction transaction = (Transaction) BeanUtil.copyProperties(transactionDTO, new Transaction());
         List<Transaction> list = transactionMapper.select(transaction);
         PageInfo pageInfo = new PageInfo(list);
