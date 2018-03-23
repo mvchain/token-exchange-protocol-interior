@@ -40,7 +40,8 @@ public class ProjectService extends BaseService {
 
     public PageInfo<ProjectVO> list() {
         List<Project> list = projectMapper.selectAll();
-        return (PageInfo<ProjectVO>) BeanUtil.beanList2VOList(list, ProjectVO.class);
+        PageInfo<Project> page = new PageInfo<>(list);
+        return (PageInfo<ProjectVO>) BeanUtil.beanList2VOList(page, ProjectVO.class);
     }
 
     public void insert(ProjectDTO projectDTO) {

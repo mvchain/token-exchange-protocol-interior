@@ -27,7 +27,8 @@ public class AccountService extends BaseService {
         account.setUsername(userFindDTO.getUsername());
         account.setId(userFindDTO.getId());
         List<Account> list = accountMapper.select(account);
-        return (PageInfo<AccountVO>) BeanUtil.beanList2VOList(list, AccountVO.class);
+        PageInfo pageInfo = new PageInfo(list);
+        return (PageInfo<AccountVO>) BeanUtil.beanList2VOList(pageInfo, AccountVO.class);
     }
 
     public AccountVO get(BigInteger id) {

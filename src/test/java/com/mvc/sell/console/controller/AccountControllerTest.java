@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -94,12 +95,21 @@ public class AccountControllerTest extends BaseTest {
     public void create() throws Exception {
         String path = "/account";
         Account account = new Account();
-        account.setUsername("416350144@qq.com");
+        String username = UUID.randomUUID() + "@qq.com";
+        account.setUsername(username);
         account.setPassword("123456");
         account.setPhone("1888888888888");
         account.setTransactionPassword("123456");
         mockResult = postResult(path, account);
-
+        // check login
+        mockResult.andExpect(status().is(403));
+        userLogin();
+        mockResult = postResult(path, account);
+        mockResult.andExpect(status().is(200));
+        path = "/account/username?username=375332835@qq.com";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data.username", is("375332835@qq.com")));
     }
 
     @Test

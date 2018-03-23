@@ -70,7 +70,8 @@ public class TransactionService extends BaseService {
     public PageInfo<TransactionVO> transaction(TransactionDTO transactionDTO) {
         Transaction transaction = (Transaction) BeanUtil.copyProperties(transactionDTO, new Transaction());
         List<Transaction> list = transactionMapper.select(transaction);
-        return (PageInfo<TransactionVO>) BeanUtil.beanList2VOList(list, TransactionVO.class);
+        PageInfo pageInfo = new PageInfo(list);
+        return (PageInfo<TransactionVO>) BeanUtil.beanList2VOList(pageInfo, TransactionVO.class);
     }
 
     public void approval(BigInteger id, Integer status) throws Exception {
