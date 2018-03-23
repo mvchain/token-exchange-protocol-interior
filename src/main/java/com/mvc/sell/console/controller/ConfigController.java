@@ -45,6 +45,7 @@ public class ConfigController extends BaseController {
     }
     @ApiIgnore
     @GetMapping(value = "token")
+    @NeedLogin
     Result<List<String>> config() {
         return ResultGenerator.genSuccessResult(configService.token());
     }

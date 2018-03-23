@@ -106,10 +106,10 @@ public class AccountControllerTest extends BaseTest {
         userLogin();
         mockResult = postResult(path, account);
         mockResult.andExpect(status().is(200));
-        path = "/account/username?username=375332835@qq.com";
+        path = "/account/username?username=" + username;
         mockResult = getResult(path, null);
         mockResult.andExpect(status().is(200));
-        mockResult.andExpect(jsonPath("$.data.username", is("375332835@qq.com")));
+        mockResult.andExpect(jsonPath("$.data.username", is(username)));
     }
 
     @Test

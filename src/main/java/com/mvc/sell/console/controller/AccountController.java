@@ -56,6 +56,7 @@ public class AccountController extends BaseController {
 
     @ApiIgnore
     @PostMapping
+    @NeedLogin
     Result create(@RequestBody Account account) {
         accountService.create(account);
         return ResultGenerator.genSuccessResult();
@@ -63,6 +64,7 @@ public class AccountController extends BaseController {
 
     @ApiIgnore
     @PutMapping
+    @NeedLogin
     Result update(@RequestBody Account account) {
         accountService.update(account);
         return ResultGenerator.genSuccessResult();
