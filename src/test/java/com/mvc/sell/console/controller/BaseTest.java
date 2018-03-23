@@ -19,9 +19,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
  * BaseTest
@@ -37,7 +38,7 @@ public class BaseTest {
     @Autowired
     WebApplicationContext context;
     private final static String KEY = "Authorization";
-
+    protected final static Map NULL_RESULT = new LinkedHashMap();
     MockMvc mockMvc;
     ObjectMapper mapper = new ObjectMapper();
 
@@ -48,10 +49,23 @@ public class BaseTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
+    ResultActions postResult(String uri, Object object) throws Exception {
+        Object token = BaseContextHandler.get(KEY);
+        ResultActions mockResult = mockMvc.perform(
+                post(uri)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .header(KEY, null == token ? "" : String.valueOf(token))
+                        .content(mapper.writeValueAsString(object))
+        );
+        return mockResult;
+    }
+
     ResultActions putResult(String uri, Object object) throws Exception {
+        Object token = BaseContextHandler.get(KEY);
         ResultActions mockResult = mockMvc.perform(
                 put(uri)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .header(KEY, null == token ? "" : String.valueOf(token))
                         .content(mapper.writeValueAsString(object))
         );
         return mockResult;
@@ -64,14 +78,14 @@ public class BaseTest {
                 get(uri)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .params(map)
-                        .header(KEY, null == token ? null : String.valueOf(token))
-                        .content(mapper.writeValueAsString(object))
+                        .header(KEY, null == token ? "" : String.valueOf(token)
+                        )
         );
         return mockResult;
     }
 
     protected void userLogin() {
-        String token = JwtHelper.createToken("testUser", BigInteger.ZERO);
+        String token = JwtHelper.createToken("testUser", BigInteger.valueOf(10001));
         BaseContextHandler.set(KEY, token);
     }
 

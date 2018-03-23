@@ -1,55 +1,105 @@
 package com.mvc.sell.console.controller;
 
-import com.mvc.sell.console.TokenSellConsoleBootstrap;
+import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.math.BigInteger;
+import java.util.LinkedHashMap;
 
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.*;
 
 public class AccountControllerTest extends BaseTest {
     @Test
     public void list() throws Exception {
+        String path = "/account";
         UserFindDTO userFindDTO = new UserFindDTO();
-        mockResult = getResult("/account", userFindDTO);
+        mockResult = getResult(path, userFindDTO);
         // check login
         mockResult.andExpect(status().is(403));
         userLogin();
         // check wrong param(SQL Injection Attack)
         userFindDTO.setOrderBy("id desc;delete * from user");
-        mockResult = getResult("/account", userFindDTO);
+        mockResult = getResult(path, userFindDTO);
         mockResult.andExpect(status().is(500));
         // check true param and result
         userFindDTO.setOrderBy("id desc");
-        userFindDTO.setId(BigInteger.ZERO);
-        mockResult = getResult("/account", userFindDTO);
+        userFindDTO.setId(BigInteger.valueOf(10001L));
+        mockResult = getResult(path, userFindDTO);
         mockResult.andExpect(status().is(200));
-        mockResult.andExpect(jsonPath("$", is(0)));
+        mockResult.andExpect(jsonPath("$.data.pageSize", is(1)));
+        mockResult.andExpect(jsonPath("$.data.list[0].id", is(10001)));
     }
 
     @Test
     public void balance() throws Exception {
+        String path = "/account/0/balance";
+        mockResult = getResult(path, null);
+        // check login
+        mockResult.andExpect(status().is(403));
+        userLogin();
+        // check wrong param(SQL Injection Attack)
+        path = "/account/afafaaf/balance";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(500));
+        // check true param and result
+        path = "/account/10001/balance";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data[0].id", is(1)));
     }
 
     @Test
     public void get() throws Exception {
+        String path = "/account/0";
+        mockResult = getResult(path, null);
+        // check login
+        mockResult.andExpect(status().is(403));
+        userLogin();
+        // check wrong param(SQL Injection Attack)
+        path = "/account/9999";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data", is(NULL_RESULT)));
+        // check true param and result
+        path = "/account/10001";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data.id", is(10001)));
     }
 
     @Test
     public void get1() throws Exception {
+        String path = "/account/username?username=111";
+        mockResult = getResult(path, null);
+        // check login
+        mockResult.andExpect(status().is(403));
+        userLogin();
+        // check wrong param(SQL Injection Attack)
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data", is(NULL_RESULT)));
+        // check true param and result
+        path = "/account/username?username=375332835@qq.com";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data.username", is("375332835@qq.com")));
     }
 
     @Test
     public void create() throws Exception {
+        String path = "/account";
+        Account account = new Account();
+        account.setUsername("416350144@qq.com");
+        account.setPassword("123456");
+        account.setPhone("1888888888888");
+        account.setTransactionPassword("123456");
+        mockResult = postResult(path, account);
+
     }
 
     @Test
