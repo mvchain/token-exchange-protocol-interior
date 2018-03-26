@@ -66,9 +66,9 @@ public class ProjectService extends BaseService {
         project.setTokenName(tokenName);
         project.setId(id);
         List<Project> result = projectMapper.select(project);
-
-        Assert.isTrue(id == null && result.size() == 0, MessageConstants.TOKEN_NAME_EXIST);
-        Assert.isTrue(result.size() == 0, MessageConstants.TOKEN_NAME_EXIST);
+        if (null == id) {
+            Assert.isTrue(result.size() == 0, MessageConstants.TOKEN_NAME_EXIST);
+        }
     }
 
     public static void main(String[] args) {
