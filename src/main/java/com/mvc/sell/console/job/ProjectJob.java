@@ -24,7 +24,7 @@ public class ProjectJob {
     @Autowired
     Web3j web3j;
 
-    @Scheduled(cron = "*/30 * * * * ?")
+    @Scheduled(cron = "*/1 * * * * ?")
     public void updateStatus() throws IOException {
         Integer num = projectService.updateStatus();
         if (num > 0) {
