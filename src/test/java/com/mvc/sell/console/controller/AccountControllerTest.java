@@ -5,12 +5,9 @@ import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import org.junit.Test;
 
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -114,6 +111,22 @@ public class AccountControllerTest extends BaseTest {
 
     @Test
     public void update() throws Exception {
+        String phone = UUID.randomUUID().toString().substring(0, 16);
+        String path = "/account";
+        Account account = new Account();
+        account.setId(BigInteger.valueOf(10001));
+        account.setPhone(phone);
+        mockResult = putResult(path, account);
+        // check login
+        mockResult.andExpect(status().is(403));
+        userLogin();
+        // user id is get from token-sell service in token, user can not change it by request
+        mockResult = putResult(path, account);
+        mockResult.andExpect(status().is(200));
+        path = "/account/10001";
+        mockResult = getResult(path, null);
+        mockResult.andExpect(status().is(200));
+        mockResult.andExpect(jsonPath("$.data.phone", is(phone)));
     }
 
 }

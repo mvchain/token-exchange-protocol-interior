@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -36,6 +37,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class BaseTest {
 
     @Autowired
+    RedisTemplate redisTemplate;
+
+    @Autowired
     WebApplicationContext context;
     private final static String KEY = "Authorization";
     protected final static Map NULL_RESULT = new LinkedHashMap();
@@ -55,6 +59,7 @@ public class BaseTest {
                 post(uri)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .header(KEY, null == token ? "" : String.valueOf(token))
+                        .sessionAttr("sessionId", "1")
                         .content(mapper.writeValueAsString(object))
         );
         return mockResult;
@@ -66,6 +71,7 @@ public class BaseTest {
                 put(uri)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .header(KEY, null == token ? "" : String.valueOf(token))
+                        .sessionAttr("id", "1")
                         .content(mapper.writeValueAsString(object))
         );
         return mockResult;
@@ -77,6 +83,7 @@ public class BaseTest {
         ResultActions mockResult = mockMvc.perform(
                 get(uri)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .sessionAttr("id", "1")
                         .params(map)
                         .header(KEY, null == token ? "" : String.valueOf(token)
                         )

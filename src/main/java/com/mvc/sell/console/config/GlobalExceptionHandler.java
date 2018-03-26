@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.web3j.protocol.core.filters.FilterException;
 
 import javax.security.auth.login.LoginException;
 
 /**
  * @author qyc
  */
-@ControllerAdvice("com.mvc")
+@ControllerAdvice
 @ResponseBody
 public class GlobalExceptionHandler {
 
@@ -33,5 +34,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result tokenErrorExceptionException() {
         return ResultGenerator.genFailResult(MessageConstants.TOKEN_EXPIRE_CODE, MessageConstants.TOKEN_EXPIRE);
+    }
+
+    @ExceptionHandler(IllegalAccessException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result illegalAccessExceptionException(IllegalAccessException e) {
+        return ResultGenerator.genFailResult(e.getMessage());
     }
 }

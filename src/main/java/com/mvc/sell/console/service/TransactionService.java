@@ -1,7 +1,10 @@
 package com.mvc.sell.console.service;
 
 import com.github.pagehelper.PageInfo;
+import com.mvc.common.msg.Result;
+import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.constants.CommonConstants;
+import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.bean.Config;
@@ -15,21 +18,27 @@ import com.mvc.sell.console.util.Web3jUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.admin.methods.response.NewAccountIdentifier;
 import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.filters.FilterException;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.Contract;
+import rx.Subscription;
 import rx.functions.Action1;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -144,18 +153,24 @@ public class TransactionService extends BaseService {
         }
     }
 
-    public void startListen() {
+    public void startListen() throws InterruptedException {
         // listen history transaction
-        historyListen();
+         historyListen();
         // listen new transaction
         newListen();
     }
 
-    private void newListen() {
-        web3j.transactionObservable().subscribe(
+    private void newListen() throws InterruptedException {
+        Subscription subscribe = web3j.transactionObservable().subscribe(
                 tx -> listenTx(tx, false),
                 getOnError()
         );
+        while (true) {
+            if (null == subscribe || subscribe.isUnsubscribed()) {
+                newListen();
+                Thread.sleep(1000);
+            }
+        }
     }
 
     private Action1<Throwable> getOnError() {
@@ -294,15 +309,21 @@ public class TransactionService extends BaseService {
         return false;
     }
 
-    private void historyListen() {
+    private void historyListen() throws InterruptedException {
         BigInteger lastBlockNumber = (BigInteger) redisTemplate.opsForValue().get(RedisConstants.LAST_BOLCK_NUMBER);
         if (null == lastBlockNumber) {
             lastBlockNumber = BigInteger.ZERO;
         }
-        web3j.replayTransactionsObservable(DefaultBlockParameter.valueOf(lastBlockNumber), DefaultBlockParameterName.LATEST).subscribe(
+        Subscription subscription = web3j.replayTransactionsObservable(DefaultBlockParameter.valueOf(lastBlockNumber), DefaultBlockParameterName.LATEST).subscribe(
                 tx -> listenTx(tx, true),
                 getOnError()
         );
+        while (true) {
+            if (null == subscription || subscription.isUnsubscribed()) {
+                newListen();
+                Thread.sleep(1000);
+            }
+        }
     }
 
     public Integer newAddress() throws IOException {
