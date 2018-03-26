@@ -157,6 +157,8 @@ public class ProjectService extends BaseService {
         Assert.notNull(config, CommonConstants.PROJECT_NOT_EXIST);
         ProjectVO project = get(buyDTO.getProjectId());
         Assert.notNull(project, CommonConstants.PROJECT_NOT_EXIST);
+        BigDecimal sold = getSold(buyDTO.getProjectId()).getSoldEth();
+        Assert.isTrue(sold.add(buyDTO.getEthNumber()).compareTo(project.getEthNumber()) < 0, MessageConstants.ETH_OVER);
         // update token balance
         Capital capital = new Capital();
         capital.setUserId(getUserId());
@@ -181,7 +183,7 @@ public class ProjectService extends BaseService {
         // update order number
         Account account = accountService.getAccount(getUserId());
         Integer orderNum = account.getOrderNum();
-        orderNum = null == orderNum ? 1 : orderNum++;
+        orderNum = null == orderNum ? 1 : ++orderNum;
         account.setOrderNum(orderNum);
         accountService.update(account);
     }
@@ -199,9 +201,14 @@ public class ProjectService extends BaseService {
     }
 
     private void updateSold(BigInteger projectId, BigDecimal ethNumber, BigDecimal balance) {
+        Orders orders = new Orders();
+        orders.setUserId(getUserId());
+        Integer orderNum = orderMapper.selectCount(orders);
+        Integer buyerNum = orderNum == 1 ? 1 : 0;
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(projectId);
         projectSold.setSoldEth(ethNumber);
+        projectSold.setBuyerNum(buyerNum);
         projectMapper.updateSoldBalance(projectSold);
     }
 
@@ -237,6 +244,7 @@ public class ProjectService extends BaseService {
         transaction.setToAddress(withdrawDTO.getAddress());
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
+        transaction.setTokenId(config.getId());
         transaction.setFromAddress(defaultUser);
         transactionMapper.insert(transaction);
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.multiply(withdrawDTO.getNumber()));

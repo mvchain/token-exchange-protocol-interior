@@ -29,6 +29,7 @@ public class AdminService extends BaseService {
         String encrypt = encoder.encode(adminDTO.getPassword());
         admin.setUsername(username);
         admin = adminMapper.selectOne(admin);
+        Assert.notNull(admin, MessageConstants.PWD_ERR);
         boolean result = encoder.matches(adminDTO.getPassword(), encrypt);
         Assert.isTrue(result, MessageConstants.PWD_ERR);
         Assert.isTrue(!CommonConstants.USER_FREEZE.equals(admin.getStatus()), "用户已冻结!");

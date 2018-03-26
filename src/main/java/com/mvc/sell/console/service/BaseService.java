@@ -47,6 +47,6 @@ public class BaseService {
 
     String getOrderId(String type) {
         Long sid = redisTemplate.opsForValue().increment(type, 1);
-        return type + sid;
+        return type + String.format("%09d", sid);
     }
 }
