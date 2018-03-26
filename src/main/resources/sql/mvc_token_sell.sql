@@ -82,7 +82,7 @@ CREATE TABLE `config` (
   `withdraw_status` int(1) NOT NULL DEFAULT '0',
   `min` float NOT NULL DEFAULT '0',
   `max` float NOT NULL DEFAULT '0',
-  `poundage` decimal(10,10) NOT NULL DEFAULT '0',
+  `poundage` decimal(10,5) NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `project_id` bigint(20) NOT NULL,
@@ -108,8 +108,8 @@ CREATE TABLE `orders` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` bigint(20) NOT NULL,
   `project_id` bigint(20) NOT NULL,
-  `eth_number` decimal(10,10) NOT NULL DEFAULT '0',
-  `token_number` decimal(10,10) NOT NULL DEFAULT '0',
+  `eth_number` decimal(10,5) NOT NULL DEFAULT '0',
+  `token_number` decimal(10,5) NOT NULL DEFAULT '0',
   `order_status` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -127,7 +127,7 @@ CREATE TABLE `project` (
   `title` varchar(64) DEFAULT NULL,
   `token_name` varchar(32) DEFAULT NULL,
   `contract_address` varchar(64) DEFAULT NULL,
-  `eth_number` decimal(10,10) DEFAULT NULL,
+  `eth_number` decimal(10,5) DEFAULT NULL,
   `ratio` float DEFAULT NULL,
   `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `stop_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -164,8 +164,8 @@ DROP TABLE IF EXISTS `project_sold`;
 CREATE TABLE `project_sold` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `buyer_num` int(11) NOT NULL DEFAULT '0',
-  `sold_eth` decimal(10,10) NOT NULL DEFAULT '0',
-  `send_token` decimal(10,10) NOT NULL DEFAULT '0',
+  `sold_eth` decimal(10,5) NOT NULL DEFAULT '0',
+  `send_token` decimal(10,5) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -186,8 +186,8 @@ CREATE TABLE `transaction` (
   `finish_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `number` decimal(10,10) DEFAULT NULL,
-  `real_number` decimal(10,10) DEFAULT NULL,
+  `number` decimal(10,5) DEFAULT NULL,
+  `real_number` decimal(10,5) DEFAULT NULL,
   `token_id` bigint(20) DEFAULT NULL,
   `from_address` varchar(64) DEFAULT NULL,
   `to_address` varchar(64) DEFAULT NULL,
