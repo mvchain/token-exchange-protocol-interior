@@ -191,7 +191,7 @@ CREATE TABLE `transaction` (
   `token_id` bigint(20) DEFAULT NULL,
   `from_address` varchar(64) DEFAULT NULL,
   `to_address` varchar(64) DEFAULT NULL,
-  `hash` varchar(64) DEFAULT NULL,
+  `hash` varchar(128) DEFAULT NULL,
   `status` int(1) DEFAULT NULL,
   `type` int(1) DEFAULT NULL,
   PRIMARY KEY (`id`)

@@ -1,8 +1,6 @@
 package com.mvc.sell.console.service;
 
 import com.github.pagehelper.PageInfo;
-import com.mvc.common.msg.Result;
-import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
@@ -18,27 +16,22 @@ import com.mvc.sell.console.util.Web3jUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.admin.methods.response.NewAccountIdentifier;
 import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.filters.FilterException;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.Contract;
 import rx.Subscription;
 import rx.functions.Action1;
 
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -88,6 +81,7 @@ public class TransactionService extends BaseService {
     }
 
     public void approval(BigInteger id, Integer status) throws Exception {
+        Assert.isTrue(status != 2, MessageConstants.STATUS_ERROR);
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setStatus(status);
@@ -114,20 +108,22 @@ public class TransactionService extends BaseService {
             String contractAddress = null;
             BigInteger value = Web3jUtil.getWei(transaction.getRealNumber(), transaction.getTokenId(), redisTemplate);
             contractAddress = getContractAddressByTokenId(transaction);
-            sendTransaction(defaultUser, transaction.getToAddress(), contractAddress, value, true);
+            String hash = sendTransaction(defaultUser, transaction.getToAddress(), contractAddress, value, true);
+            transaction.setHash(hash);
+            transactionMapper.updateByPrimaryKeySelective(transaction);
         }
     }
 
     private String getContractAddressByTokenId(Transaction transaction) {
         String contractAddress = null;
-        if (!transaction.getTokenId().equals(0)) {
+        if (!transaction.getTokenId().equals(BigInteger.ZERO)) {
             Project project = projectService.getByTokenId(transaction.getTokenId());
             contractAddress = project.getContractAddress();
         }
         return contractAddress;
     }
 
-    private void sendTransaction(String fromAddress, String toAddress, String contractAddress, BigInteger realNumber, Boolean listen) throws Exception {
+    private String sendTransaction(String fromAddress, String toAddress, String contractAddress, BigInteger realNumber, Boolean listen) throws Exception {
         PersonalUnlockAccount flag = admin.personalUnlockAccount(fromAddress, password).send();
         Assert.isTrue(flag.accountUnlocked(), "unlock error");
         org.web3j.protocol.core.methods.request.Transaction transaction = new org.web3j.protocol.core.methods.request.Transaction(
@@ -147,15 +143,16 @@ public class TransactionService extends BaseService {
             // send token
             result = contractService.eth_sendTransaction(transaction, contractAddress);
         }
-        Assert.isTrue(result != null && !result.hasError(), null == result ? "发送失败" : result.getError().getMessage());
+        Assert.isTrue(result != null && !result.hasError(), null != result.getError() ? result.getError().getMessage() : "发送失败");
         if (listen) {
             redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + result.getTransactionHash(), 1);
         }
+        return result.getTransactionHash();
     }
 
     public void startListen() throws InterruptedException {
         // listen history transaction
-         historyListen();
+        historyListen();
         // listen new transaction
         newListen();
     }
@@ -192,6 +189,7 @@ public class TransactionService extends BaseService {
 
     private void hashHandler(org.web3j.protocol.core.methods.response.Transaction tx) {
         try {
+
             String key = RedisConstants.LISTEN_HASH + "#" + tx.getHash();
             String hash = tx.getHash();
             if (!redisTemplate.hasKey(key)) {
@@ -208,6 +206,8 @@ public class TransactionService extends BaseService {
             } else {
                 transaction.setStatus(CommonConstants.STATUS_SUCCESS);
             }
+            transactionMapper.updateByPrimaryKeySelective(transaction);
+            redisTemplate.delete(key);
         } catch (Exception e) {
             log.error(e);
         }

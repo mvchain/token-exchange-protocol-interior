@@ -24,4 +24,5 @@ public interface MessageConstants {
     Integer TOKEN_ERROR_CODE = 50015;
     String TOKEN_NAME_EXIST = "币种名称已存在";
     String ETH_OVER = "超出可购买数量";
+    String STATUS_ERROR = "状态设置错误";
 }
