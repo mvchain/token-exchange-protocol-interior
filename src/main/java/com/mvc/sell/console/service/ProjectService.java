@@ -13,6 +13,7 @@ import com.mvc.sell.console.pojo.dto.WithdrawDTO;
 import com.mvc.sell.console.pojo.vo.*;
 import com.mvc.sell.console.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.web3j.utils.Convert;
@@ -37,6 +38,8 @@ public class ProjectService extends BaseService {
     AccountService accountService;
     @Autowired
     OrderService orderService;
+    @Value("${wallet.user}")
+    String defaultUser;
 
     public PageInfo<ProjectVO> list() {
         List<Project> list = projectMapper.selectAll();
@@ -234,6 +237,7 @@ public class ProjectService extends BaseService {
         transaction.setToAddress(withdrawDTO.getAddress());
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
+        transaction.setFromAddress(defaultUser);
         transactionMapper.insert(transaction);
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.multiply(withdrawDTO.getNumber()));
     }
