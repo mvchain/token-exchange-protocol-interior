@@ -46,7 +46,7 @@ public class ProjectService extends BaseService {
 
     public void insert(ProjectDTO projectDTO) {
         Project project = (Project) BeanUtil.copyProperties(projectDTO, new Project());
-        checkTokenName(projectDTO.getTokenName());
+        checkTokenName(projectDTO.getTokenName(), projectDTO.getId());
         projectMapper.insertSelective(project);
         Config config = new Config();
         config.setProjectId(project.getId());
@@ -61,10 +61,13 @@ public class ProjectService extends BaseService {
         tokenSoldMapper.insert(projectSold);
     }
 
-    private void checkTokenName(String tokenName) {
+    private void checkTokenName(String tokenName, BigInteger id) {
         Project project = new Project();
         project.setTokenName(tokenName);
+        project.setId(id);
         List<Project> result = projectMapper.select(project);
+
+        Assert.isTrue(id == null && result.size() == 0, MessageConstants.TOKEN_NAME_EXIST);
         Assert.isTrue(result.size() == 0, MessageConstants.TOKEN_NAME_EXIST);
     }
 
@@ -85,7 +88,7 @@ public class ProjectService extends BaseService {
 
     public void update(ProjectDTO projectDTO) {
         Project project = (Project) BeanUtil.copyProperties(projectDTO, new Project());
-        checkTokenName(projectDTO.getTokenName());
+        checkTokenName(projectDTO.getTokenName(), project.getId());
         projectMapper.updateByPrimaryKeySelective(project);
         Config config = new Config();
         config.setProjectId(project.getId());
