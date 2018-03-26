@@ -55,7 +55,6 @@ CREATE TABLE `admin` (
 -- ----------------------------
 -- Records of admin
 -- ----------------------------
-INSERT INTO `admin` VALUES ('1', 'mvc-admin', '$2a$08$0y/jCDiPLDaX8S4k81hd0OOQW5UIQJTNoUc2dAICiBZvYO65wkbQi', '1', null, '2018-03-17 04:20:38', '2018-03-22 11:56:06');
 
 -- ----------------------------
 -- Table structure for `capital`
