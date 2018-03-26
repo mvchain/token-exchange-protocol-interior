@@ -24,14 +24,14 @@ CREATE TABLE `account` (
   `username` varchar(64) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `status` int(1) NOT NULL,
+  `status` int(1) NOT NULL DEFAULT '1',
   `password` varchar(128) NOT NULL,
   `transaction_password` varchar(128) NOT NULL,
   `phone` varchar(32) DEFAULT NULL,
-  `order_num` int(11) DEFAULT NULL,
+  `order_num` int(11) DEFAULT '0',
   `address_eth` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of account
@@ -55,7 +55,7 @@ CREATE TABLE `admin` (
 -- ----------------------------
 -- Records of admin
 -- ----------------------------
-INSERT INTO `admin` VALUES ('1', 'user', 'admin', '1', null, '2018-03-17 04:20:38', '2018-03-17 04:20:38');
+INSERT INTO `admin` VALUES ('1', 'mvc-admin', '$2a$08$0y/jCDiPLDaX8S4k81hd0OOQW5UIQJTNoUc2dAICiBZvYO65wkbQi', '1', null, '2018-03-17 04:20:38', '2018-03-22 11:56:06');
 
 -- ----------------------------
 -- Table structure for `capital`
@@ -79,23 +79,24 @@ CREATE TABLE `capital` (
 DROP TABLE IF EXISTS `config`;
 CREATE TABLE `config` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `recharge_status` int(1) DEFAULT '0',
-  `withdraw_status` int(1) DEFAULT '0',
-  `min` float DEFAULT NULL,
-  `max` float DEFAULT NULL,
-  `poundage` decimal(10,0) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `project_id` bigint(20) DEFAULT NULL,
-  `token_name` varchar(32) DEFAULT NULL,
-  `need_show` int(1) DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+  `recharge_status` int(1) NOT NULL DEFAULT '0',
+  `withdraw_status` int(1) NOT NULL DEFAULT '0',
+  `min` float NOT NULL DEFAULT '0',
+  `max` float NOT NULL DEFAULT '0',
+  `poundage` decimal(10,0) NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `project_id` bigint(20) NOT NULL,
+  `token_name` varchar(32) NOT NULL,
+  `need_show` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_token_name` (`token_name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Records of config
 -- ----------------------------
-INSERT INTO `config` VALUES ('0', '0', '0', '0', '0', '0', '2018-03-17 04:21:14', '2018-03-17 04:21:17', '0', 'ETH', '1');
+INSERT INTO `config` VALUES ('0', '0', '0', '0', '0', '0', '2018-03-17 04:21:14', '2018-03-26 13:34:14', '0', 'ETH', '1');
 
 -- ----------------------------
 -- Table structure for `orders`
@@ -103,14 +104,14 @@ INSERT INTO `config` VALUES ('0', '0', '0', '0', '0', '0', '2018-03-17 04:21:14'
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `order_id` bigint(20) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user_id` bigint(20) DEFAULT NULL,
-  `project_id` bigint(20) DEFAULT NULL,
-  `eth_number` decimal(10,0) DEFAULT NULL,
-  `token_number` decimal(10,0) DEFAULT NULL,
-  `order_status` int(1) DEFAULT NULL,
+  `order_id` varchar(64) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user_id` bigint(20) NOT NULL,
+  `project_id` bigint(20) NOT NULL,
+  `eth_number` decimal(10,0) NOT NULL DEFAULT '0',
+  `token_number` decimal(10,0) NOT NULL DEFAULT '0',
+  `order_status` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -129,20 +130,27 @@ CREATE TABLE `project` (
   `contract_address` varchar(64) DEFAULT NULL,
   `eth_number` decimal(10,0) DEFAULT NULL,
   `ratio` float DEFAULT NULL,
-  `start_time` timestamp NULL DEFAULT NULL,
-  `stop_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `stop_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `homepage` varchar(255) DEFAULT NULL,
   `white_paper_address` varchar(255) DEFAULT NULL,
   `white_paper_name` varchar(64) DEFAULT NULL,
   `project_image_address` varchar(255) DEFAULT NULL,
   `project_image_name` varchar(64) DEFAULT NULL,
+  `project_cover_address` varchar(255) DEFAULT NULL,
+  `project_cover_name` varchar(64) DEFAULT NULL,
   `leader_image_address` varchar(255) DEFAULT NULL,
   `leader_image_name` varchar(64) DEFAULT NULL,
   `leader_name` varchar(64) DEFAULT NULL,
   `position` varchar(64) DEFAULT NULL,
   `description` varchar(512) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `status` int(1) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `status` int(1) NOT NULL DEFAULT '0',
+  `decimals` int(2) DEFAULT NULL,
+  `need_show` int(1) NOT NULL DEFAULT '0',
+  `send_token` int(1) NOT NULL DEFAULT '0',
+  `retire` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -156,9 +164,9 @@ CREATE TABLE `project` (
 DROP TABLE IF EXISTS `project_sold`;
 CREATE TABLE `project_sold` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `buyer_num` int(11) DEFAULT '0',
-  `sold_eth` decimal(10,0) DEFAULT NULL,
-  `send_token` decimal(10,0) DEFAULT NULL,
+  `buyer_num` int(11) NOT NULL DEFAULT '0',
+  `sold_eth` decimal(10,0) NOT NULL DEFAULT '0',
+  `send_token` decimal(10,0) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -177,8 +185,8 @@ CREATE TABLE `transaction` (
   `poundage` float DEFAULT NULL,
   `start_at` timestamp NULL DEFAULT NULL,
   `finish_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `number` decimal(10,0) DEFAULT NULL,
   `real_number` decimal(10,0) DEFAULT NULL,
   `token_id` bigint(20) DEFAULT NULL,
@@ -193,3 +201,5 @@ CREATE TABLE `transaction` (
 -- ----------------------------
 -- Records of transaction
 -- ----------------------------
+
+update config set id = 0;
