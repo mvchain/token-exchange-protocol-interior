@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 
@@ -16,6 +17,7 @@ import java.math.BigInteger;
  * @create 2018/3/12 14:46
  */
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class BaseService {
 
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(8);
