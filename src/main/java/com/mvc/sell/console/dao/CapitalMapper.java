@@ -18,7 +18,7 @@ import java.util.List;
  * @create 2018/3/13 17:31
  */
 public interface CapitalMapper extends Mapper<Capital> {
-    @Select("SELECT t1.*, t1.id token_id, IFNULL(t2.balance,0) FROM config t1 LEFT JOIN capital t2 ON t1.id = t2.token_id WHERE t1.need_show = 1 AND (t2.user_id = #{userId} OR t2.user_id is NULL)")
+    @Select("SELECT t2.*, t2.id token_id, IFNULL(t1.balance,0) balance FROM capital t1 RIGHT JOIN config t2 ON t1.token_id = t2.id and t1.user_id = #{userId}")
     List<CapitalVO> selectBalance(Capital capital);
 
     @Update("update capital set balance = balance + #{balance} where user_id = #{userId} and token_id = #{tokenId}")
