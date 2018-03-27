@@ -25,4 +25,5 @@ public interface MessageConstants {
     String TOKEN_NAME_EXIST = "币种名称已存在";
     String ETH_OVER = "超出可购买数量";
     String STATUS_ERROR = "状态设置错误";
+    String DIGIT_ERR = "小数位数错误";
 }

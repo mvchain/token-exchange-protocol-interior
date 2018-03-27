@@ -41,8 +41,6 @@ public class OrderService extends BaseService {
         Assert.isTrue(orders.getOrderStatus() == 0, MessageConstants.CANNOT_CANCEL);
         orders.setOrderStatus(orderStatus);
         orderMapper.updateByPrimaryKeySelective(orders);
-
-        Config config = configService.getByPorjectId(orders.getProjectId());
         tokenSoldMapper.updateEth(orders.getProjectId(), orders.getEthNumber());
 
     }

@@ -26,7 +26,7 @@ public interface OrderMapper extends Mapper<Orders> {
     void updateStatusByProject(@Param("projectId") BigInteger projectId, @Param("orderStatus") Integer orderStatus);
 
     @Select({"<script>",
-            "select t1.*, t2.token_name project_name, t2.status from orders t1, project t2 where t1.project_id = t2.id ",
+            "select t1.*, t2.title project_name, t2.status from orders t1, project t2 where t1.project_id = t2.id ",
             "<when test=\"status!=null\">",
             "and t2.status = #{status}",
             "</when>",

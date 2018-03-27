@@ -16,11 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,13 +47,7 @@ public class ProjectService extends BaseService {
 
     public void insert(ProjectDTO projectDTO) {
         Project project = (Project) BeanUtil.copyProperties(projectDTO, new Project());
-        checkTokenName(projectDTO.getTokenName(), projectDTO.getId());
         projectMapper.insertSelective(project);
-        Config config = new Config();
-        config.setProjectId(project.getId());
-        config.setTokenName(project.getTokenName());
-        configService.insert(config);
-        setUnit(config.getId(), project.getDecimals());
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(project.getId());
         projectSold.setBuyerNum(0);
@@ -64,39 +56,9 @@ public class ProjectService extends BaseService {
         tokenSoldMapper.insert(projectSold);
     }
 
-    private void checkTokenName(String tokenName, BigInteger id) {
-        Project project = new Project();
-        project.setTokenName(tokenName);
-        project.setId(id);
-        List<Project> result = projectMapper.select(project);
-        if (null == id) {
-            Assert.isTrue(result.size() == 0, MessageConstants.TOKEN_NAME_EXIST);
-        }
-    }
-
-    public static void main(String[] args) {
-        Arrays.stream(Convert.Unit.values()).forEach(obj -> System.out.println(obj.getWeiFactor().toString().length() - 1));
-    }
-
-    private void setUnit(BigInteger id, Integer decimals) {
-        Arrays.stream(Convert.Unit.values()).forEach(obj -> {
-                    int value = obj.getWeiFactor().toString().length() - 1;
-                    if (decimals == value) {
-                        redisTemplate.opsForValue().set(RedisConstants.UNIT + "#" + id, obj);
-
-                    }
-                }
-        );
-    }
-
     public void update(ProjectDTO projectDTO) {
         Project project = (Project) BeanUtil.copyProperties(projectDTO, new Project());
-        checkTokenName(projectDTO.getTokenName(), project.getId());
         projectMapper.updateByPrimaryKeySelective(project);
-        Config config = new Config();
-        config.setProjectId(project.getId());
-        config.setTokenName(project.getTokenName());
-        configService.update(config);
     }
 
     public ProjectVO get(BigInteger id) {
@@ -151,27 +113,11 @@ public class ProjectService extends BaseService {
     }
 
     public void buy(BuyDTO buyDTO) {
-        Config config = new Config();
-        config.setProjectId(buyDTO.getProjectId());
-        config = configMapper.selectOne(config);
-        Assert.notNull(config, CommonConstants.PROJECT_NOT_EXIST);
         ProjectVO project = get(buyDTO.getProjectId());
         Assert.notNull(project, CommonConstants.PROJECT_NOT_EXIST);
         BigDecimal sold = getSold(buyDTO.getProjectId()).getSoldEth();
         Assert.isTrue(sold.add(buyDTO.getEthNumber()).compareTo(project.getEthNumber()) < 0, MessageConstants.ETH_OVER);
-        // update token balance
-        Capital capital = new Capital();
-        capital.setUserId(getUserId());
-        capital.setTokenId(config.getId());
-        Capital capitalTemp = capitalMapper.selectOne(capital);
         BigDecimal balance = buyDTO.getEthNumber().multiply(new BigDecimal(project.getRatio()));
-        if (null == capitalTemp) {
-            capitalTemp = capital;
-            capitalTemp.setBalance(balance);
-            capitalMapper.insert(capital);
-        } else {
-            capitalMapper.updateBalance(getUserId(), config.getId(), balance);
-        }
         // update ethBalance
         Capital ethCapital = new Capital();
         ethCapital.setUserId(getUserId());
@@ -186,6 +132,8 @@ public class ProjectService extends BaseService {
         orderNum = null == orderNum ? 1 : ++orderNum;
         account.setOrderNum(orderNum);
         accountService.update(account);
+        String key = RedisConstants.USER_PROJECTS + "#" + getUserId();
+        redisTemplate.opsForValue().set(key, orderMapper.getUserProject(getUserId()));
     }
 
     private void addOrder(BuyDTO buyDTO, BigDecimal balance) {
@@ -282,13 +230,6 @@ public class ProjectService extends BaseService {
         Assert.isTrue(null != account && account.getTransactionPassword().equalsIgnoreCase(withdrawDTO.getTransactionPassword()), CommonConstants.USER_PWD_ERR);
     }
 
-    public Project getByContractAddress(String contractAddress) {
-        Project project = new Project();
-        project.setContractAddress(contractAddress);
-        return projectMapper.selectOne(project);
-
-    }
-
     public Integer updateStatus() {
         Integer number = 0;
         number = number + projectMapper.updateStart();
@@ -303,14 +244,6 @@ public class ProjectService extends BaseService {
         projectMapper.updateByPrimaryKeySelective(project);
     }
 
-    public void delete(BigInteger id) {
-        Project project = getNotNullById(id);
-        Boolean canDelete = project.getStatus().equals(0) || project.getSendToken().equals(1);
-        Assert.isTrue(canDelete, MessageConstants.CANNOT_DELETE);
-        projectMapper.delete(project);
-        configService.deleteByProjectId(project.getId());
-    }
-
     private Project getNotNullById(BigInteger id) {
         Project project = new Project();
         project.setId(id);
@@ -322,33 +255,30 @@ public class ProjectService extends BaseService {
 
     public void sendToken(BigInteger id, Integer sendToken) {
         Project project = getNotNullById(id);
+        Config config = configService.getConfigByTokenName(project.getTokenName());
         // 当前未发币且项目结束后可用
         Boolean canSend = project.getStatus().equals(2) && project.getSendToken() == 0;
         Assert.isTrue(canSend, MessageConstants.CANNOT_SEND_TOKEN);
         project.setSendToken(1);
         projectMapper.updateByPrimaryKeySelective(project);
         orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_SEND_TOKEN);
+        projectMapper.sendToken(getUserId(), id, config.getId());
     }
 
     public void retire(BigInteger id, Integer retire) {
         Project project = getNotNullById(id);
         // 项目结束后可用, 使用一次此功能后或此项目代币开放提币后禁用
-        Config config = configService.getByPorjectId(project.getId());
+        Config config = configService.getConfigByTokenName(project.getTokenName());
         Boolean canRetire = project.getStatus().equals(2) && project.getRetire().equals(0) && config.getRechargeStatus().equals(0);
         Assert.isTrue(canRetire, MessageConstants.CANNOT_RETIRE);
         project.setRetire(1);
         projectMapper.updateByPrimaryKeySelective(project);
         orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_RETIRE);
-    }
-
-    public Project getByTokenId(BigInteger tokenId) {
-        Config config = configService.getByTokenId(tokenId);
-        Project project = new Project();
-        project.setId(config.getProjectId());
-        return projectMapper.selectByPrimaryKey(project);
+        projectMapper.retireBalance(getUserId(), id);
     }
 
     public List<Project> select(Project project) {
         return projectMapper.select(project);
     }
+
 }

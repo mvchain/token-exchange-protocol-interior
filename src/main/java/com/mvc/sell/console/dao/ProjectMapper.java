@@ -38,9 +38,15 @@ public interface ProjectMapper extends Mapper<Project> {
     @Update("update project set status = 1 where start_time < now() and status = 0")
     Integer updateStart();
 
-    @Update("update project set status = 2 where stop_time < now() and status = 1")
+    @Update("update project t1, project_sold t2 set t1.status = 2 where t1.id = t2.id  and t1.status = 1 and (t1.stop_time < now() or t1.eth_number <= t2.sold_eth)")
     Integer updateFinish();
 
     @Update("update project_sold set buyer_num = buyer_num+#{buyerNum}, sold_eth = sold_eth + #{soldEth} where id = #{id}")
     void updateSoldBalance(ProjectSold projectSold);
+
+    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(eth_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 4) where token_id = 0")
+    void retireBalance(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId);
+
+    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(token_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 2) WHERE token_id = #{tokenId}")
+    void sendToken(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
 }

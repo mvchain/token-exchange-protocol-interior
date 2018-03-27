@@ -6,7 +6,6 @@ import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.pojo.bean.Account;
 import com.mvc.sell.console.pojo.bean.Config;
-import com.mvc.sell.console.pojo.bean.Project;
 import com.mvc.sell.console.pojo.bean.Transaction;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
@@ -69,9 +68,6 @@ public class TransactionService extends BaseService {
     public final static BigInteger DEFAULT_GAS_PRICE = Contract.GAS_PRICE.divide(BigInteger.valueOf(5));
     public final static BigInteger DEFAULT_GAS_LIMIT = Contract.GAS_LIMIT.divide(BigInteger.valueOf(10));
 
-    private BigDecimal TOKEN_TRANS_LIMIT = new BigDecimal(1000);
-    private BigDecimal ETH_TRANS_LIMIT = new BigDecimal(10);
-
     public PageInfo<TransactionVO> transaction(TransactionDTO transactionDTO) {
         transactionDTO.setOrderId(StringUtils.isEmpty(transactionDTO.getOrderId()) ? null : transactionDTO.getOrderId());
         Transaction transaction = (Transaction) BeanUtil.copyProperties(transactionDTO, new Transaction());
@@ -115,12 +111,7 @@ public class TransactionService extends BaseService {
     }
 
     private String getContractAddressByTokenId(Transaction transaction) {
-        String contractAddress = null;
-        if (!transaction.getTokenId().equals(BigInteger.ZERO)) {
-            Project project = projectService.getByTokenId(transaction.getTokenId());
-            contractAddress = project.getContractAddress();
-        }
-        return contractAddress;
+        return configService.getByTokenId(transaction.getTokenId()).getContractAddress();
     }
 
     private String sendTransaction(String fromAddress, String toAddress, String contractAddress, BigInteger realNumber, Boolean listen) throws Exception {
@@ -255,7 +246,6 @@ public class TransactionService extends BaseService {
             EthGetBalance result = web3j.ethGetBalance(transaction.getToAddress(), DefaultBlockParameterName.LATEST).send();
             BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE);
             BigInteger sendBalance = result.getBalance().subtract(needBalance);
-//            Web3jUtil.getWei(ethLimit, transaction.getTokenId(), redisTemplate)
             if (sendGasIfNull(transaction, result, needBalance)) {
                 return;
             }
@@ -292,7 +282,7 @@ public class TransactionService extends BaseService {
 
     private BigInteger getTokenId(org.web3j.protocol.core.methods.response.Transaction tx) {
         if (Web3jUtil.isContractTx(tx)) {
-            BigInteger tokenId = transactionMapper.selectTokenIdByContractAddress(tx.getTo());
+            BigInteger tokenId =  configService.getIdByContractAddress(tx.getTo());
             return tokenId;
         } else {
             return BigInteger.ZERO;

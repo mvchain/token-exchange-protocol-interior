@@ -22,7 +22,6 @@ public class Project {
     @NotNull(message = MessageConstants.TITLE_EMPTY)
     private String title;
     private String tokenName;
-    private String contractAddress;
     private BigDecimal ethNumber;
     private Float ratio;
     private Date startTime;
@@ -42,7 +41,6 @@ public class Project {
     private Date createdAt;
     private Date updatedAt;
     private Integer status;
-    private Integer decimals;
     private Integer needShow;
     private Integer sendToken;
     private Integer retire;

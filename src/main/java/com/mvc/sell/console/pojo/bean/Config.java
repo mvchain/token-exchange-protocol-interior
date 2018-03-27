@@ -26,5 +26,7 @@ public class Config {
     private BigInteger projectId;
     private String tokenName;
     private Integer needShow;
+    private String contractAddress;
+    private Integer decimals;
 
 }
