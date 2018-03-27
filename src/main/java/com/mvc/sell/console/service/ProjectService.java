@@ -281,4 +281,10 @@ public class ProjectService extends BaseService {
         return projectMapper.select(project);
     }
 
+    public void delete(BigInteger id) {
+        Project project = getNotNullById(id);
+        Boolean canDelete = project.getStatus().equals(0) || project.getSendToken().equals(1);
+        Assert.isTrue(canDelete, MessageConstants.CANNOT_DELETE);
+        projectMapper.delete(project);
+    }
 }
