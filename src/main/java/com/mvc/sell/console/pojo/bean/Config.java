@@ -23,7 +23,6 @@ public class Config {
     private Float poundage;
     private Date createdAt;
     private Date updatedAt;
-    private BigInteger projectId;
     private String tokenName;
     private Integer needShow;
     private String contractAddress;
