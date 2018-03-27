@@ -248,9 +248,11 @@ public class TransactionService extends BaseService {
         capital.setTokenId(transaction.getTokenId());
         Capital capitalTemp = capitalMapper.selectOne(capital);
         if (null == capitalTemp) {
+            capital.setBalance(transaction.getNumber());
             capitalMapper.insert(capital);
+        } else {
+            capitalMapper.updateBalance(transaction.getUserId(), transaction.getTokenId(), transaction.getNumber());
         }
-        capitalMapper.updateBalance(transaction.getUserId(), transaction.getTokenId(), transaction.getNumber());
     }
 
     @Async
@@ -263,7 +265,7 @@ public class TransactionService extends BaseService {
                 return;
             }
             String contractAddress = getContractAddressByTokenId(transaction);
-            if (!transaction.getTokenId().equals(0)) {
+            if (!transaction.getTokenId().equals(BigInteger.ZERO)) {
                 // erc20 token
                 sendBalance = contractService.balanceOf(contractAddress, transaction.getToAddress());
             }
