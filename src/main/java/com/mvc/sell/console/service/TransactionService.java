@@ -5,6 +5,7 @@ import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.pojo.bean.Account;
+import com.mvc.sell.console.pojo.bean.Capital;
 import com.mvc.sell.console.pojo.bean.Config;
 import com.mvc.sell.console.pojo.bean.Transaction;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
@@ -235,9 +236,21 @@ public class TransactionService extends BaseService {
         transaction.setRealNumber(transaction.getNumber());
         transactionMapper.insertSelective(transaction);
         // update balance
-        capitalMapper.updateBalance(transaction.getUserId(), transaction.getTokenId(), transaction.getNumber());
+
+        updateBalance(transaction);
         // transfer balance
         this.transferBalance(transaction);
+    }
+
+    private void updateBalance(Transaction transaction) {
+        Capital capital = new Capital();
+        capital.setUserId(transaction.getUserId());
+        capital.setTokenId(transaction.getTokenId());
+        Capital capitalTemp = capitalMapper.selectOne(capital);
+        if (null == capitalTemp) {
+            capitalMapper.insert(capital);
+        }
+        capitalMapper.updateBalance(transaction.getUserId(), transaction.getTokenId(), transaction.getNumber());
     }
 
     @Async
@@ -256,6 +269,7 @@ public class TransactionService extends BaseService {
             }
             sendTransaction(transaction.getToAddress(), defaultUser, contractAddress, sendBalance, false);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.getMessage());
         }
     }
