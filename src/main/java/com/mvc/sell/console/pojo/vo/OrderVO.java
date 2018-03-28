@@ -29,5 +29,7 @@ public class OrderVO implements Serializable {
     private Integer orderStatus;
     private String projectName;
     private Integer status;
+    private Integer retire;
+    private Integer sendToken;
 
 }
