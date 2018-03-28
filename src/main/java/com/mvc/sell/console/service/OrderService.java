@@ -42,6 +42,7 @@ public class OrderService extends BaseService {
         orders.setOrderStatus(orderStatus);
         orderMapper.updateByPrimaryKeySelective(orders);
         tokenSoldMapper.updateEth(orders.getProjectId(), orders.getEthNumber());
+        capitalMapper.updateBalance(orders.getUserId(), BigInteger.ZERO, orders.getEthNumber());
 
     }
 
