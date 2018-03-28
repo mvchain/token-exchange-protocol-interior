@@ -195,7 +195,7 @@ public class ProjectService extends BaseService {
         transaction.setTokenId(config.getId());
         transaction.setFromAddress(defaultUser);
         transactionMapper.insert(transaction);
-        capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.multiply(withdrawDTO.getNumber()));
+        capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.subtract(withdrawDTO.getNumber()));
     }
 
     private void checkCanWithdraw(WithdrawDTO withdrawDTO, Config config) {
