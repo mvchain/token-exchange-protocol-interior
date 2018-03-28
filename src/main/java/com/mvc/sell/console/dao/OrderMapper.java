@@ -19,7 +19,7 @@ import java.util.List;
  */
 public interface OrderMapper extends Mapper<Orders> {
 
-    @Select("SELECT id FROM orders WHERE user_id = #{userId} GROUP BY project_id")
+    @Select("SELECT project_id FROM orders WHERE user_id = #{userId} GROUP BY project_id")
     List<BigInteger> getUserProject(BigInteger userId);
 
     @Update("update orders set order_status = #{orderStatus} where project_id = #{projectId} and order_status = 0")
