@@ -198,14 +198,6 @@ public class ProjectService extends BaseService {
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.multiply(withdrawDTO.getNumber()));
     }
 
-    private void checkEthBalance(WithdrawDTO withdrawDTO, Config config) {
-        Capital capital = new Capital();
-        capital.setTokenId(config.getId());
-        capital.setUserId(getUserId());
-        capital = capitalMapper.selectOne(capital);
-        Assert.isTrue(null != capital && capital.getBalance().compareTo(withdrawDTO.getNumber()) > 0, CommonConstants.ETH_NOT_ENOUGH);
-    }
-
     private void checkCanWithdraw(WithdrawDTO withdrawDTO, Config config) {
         String addressKey = RedisConstants.LISTEN_ETH_ADDR + "#" + withdrawDTO.getAddress();
         // 不能提现到临时地址
@@ -215,6 +207,14 @@ public class ProjectService extends BaseService {
         use = null == use ? BigDecimal.ZERO : use;
         Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) > 0;
         Assert.isTrue(canWithdraw, CommonConstants.NOT_ENOUGH);
+    }
+
+    private void checkEthBalance(WithdrawDTO withdrawDTO, Config config) {
+        Capital capital = new Capital();
+        capital.setTokenId(config.getId());
+        capital.setUserId(getUserId());
+        capital = capitalMapper.selectOne(capital);
+        Assert.isTrue(null != capital && capital.getBalance().compareTo(withdrawDTO.getNumber()) > 0, CommonConstants.ETH_NOT_ENOUGH);
     }
 
     private Config getConfig(String tokenName) {

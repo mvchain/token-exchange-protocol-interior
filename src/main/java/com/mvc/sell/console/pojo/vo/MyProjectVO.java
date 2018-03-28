@@ -3,6 +3,7 @@ package com.mvc.sell.console.pojo.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * MyProjectVO
@@ -15,7 +16,7 @@ public class MyProjectVO extends ProjectVO implements Serializable {
     private static final long serialVersionUID = -3075200194863929308L;
 
     private Boolean partake;
-    private Integer soldEth;
+    private BigDecimal soldEth;
     private Integer buyerNum;
 
 }
