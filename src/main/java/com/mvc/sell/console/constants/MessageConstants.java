@@ -26,4 +26,5 @@ public interface MessageConstants {
     String ETH_OVER = "超出可购买数量";
     String STATUS_ERROR = "状态设置错误";
     String DIGIT_ERR = "小数位数错误";
+    String TRANSFER_PWD_ERR = "交易密码错误";
 }
