@@ -24,5 +24,6 @@ public class BuyDTO implements Serializable {
     @DecimalMin(value = "0.1", message = MessageConstants.ETH_MIN)
     @Digits(integer = 10, fraction = 1, message = MessageConstants.DIGIT_ERR)
     private BigDecimal ethNumber;
+    private String transactionPassword;
 
 }

@@ -113,6 +113,9 @@ public class ProjectService extends BaseService {
     }
 
     public void buy(BuyDTO buyDTO) {
+        // update order number
+        Account account = accountService.getAccount(getUserId());
+        Assert.isTrue(encoder.matches(buyDTO.getTransactionPassword(), account.getPassword()), MessageConstants.TRANSFER_PWD_ERR);
         ProjectVO project = get(buyDTO.getProjectId());
         Assert.notNull(project, CommonConstants.PROJECT_NOT_EXIST);
         BigDecimal sold = getSold(buyDTO.getProjectId()).getSoldEth();
@@ -126,8 +129,6 @@ public class ProjectService extends BaseService {
         Assert.isTrue(result > 0, CommonConstants.ETH_NOT_ENOUGH);
         // add order
         addOrder(buyDTO, balance);
-        // update order number
-        Account account = accountService.getAccount(getUserId());
         Integer orderNum = account.getOrderNum();
         orderNum = null == orderNum ? 1 : ++orderNum;
         account.setOrderNum(orderNum);
