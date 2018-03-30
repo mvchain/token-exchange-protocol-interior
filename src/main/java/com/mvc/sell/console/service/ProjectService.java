@@ -152,8 +152,9 @@ public class ProjectService extends BaseService {
     private void updateSold(BigInteger projectId, BigDecimal ethNumber, BigDecimal balance) {
         Orders orders = new Orders();
         orders.setUserId(getUserId());
+        orders.setProjectId(projectId);
         Integer orderNum = orderMapper.selectCount(orders);
-        Integer buyerNum = orderNum == 1 ? 1 : 0;
+        Integer buyerNum = orderNum == 0 ? 1 : 0;
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(projectId);
         projectSold.setSoldEth(ethNumber);
