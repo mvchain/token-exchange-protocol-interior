@@ -31,6 +31,12 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
     private String eurekaKey;
 
     @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        BaseContextHandler.remove();
+        super.afterCompletion(request, response, handler, ex);
+    }
+
+    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HandlerMethod handlerMethod = (HandlerMethod) handler;
 
