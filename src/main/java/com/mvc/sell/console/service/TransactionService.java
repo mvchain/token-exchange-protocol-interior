@@ -93,7 +93,7 @@ public class TransactionService extends BaseService {
             Transaction transaction = new Transaction();
             transaction.setId(id);
             transaction = transactionMapper.selectByPrimaryKey(transaction);
-            capitalMapper.updateBalance(getUserId(), transaction.getTokenId(), transaction.getNumber());
+            capitalMapper.updateBalance(transaction.getUserId(), transaction.getTokenId(), transaction.getNumber());
         }
     }
 
