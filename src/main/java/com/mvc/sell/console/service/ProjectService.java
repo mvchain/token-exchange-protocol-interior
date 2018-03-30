@@ -115,7 +115,7 @@ public class ProjectService extends BaseService {
     public void buy(BuyDTO buyDTO) {
         // update order number
         Account account = accountService.getAccount(getUserId());
-        Assert.isTrue(encoder.matches(buyDTO.getTransactionPassword(), account.getPassword()), MessageConstants.TRANSFER_PWD_ERR);
+        Assert.isTrue(encoder.matches(buyDTO.getTransactionPassword(), account.getTransactionPassword()), MessageConstants.TRANSFER_PWD_ERR);
         ProjectVO project = get(buyDTO.getProjectId());
         Assert.notNull(project, CommonConstants.PROJECT_NOT_EXIST);
         BigDecimal sold = getSold(buyDTO.getProjectId()).getSoldEth();
