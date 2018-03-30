@@ -16,4 +16,5 @@ public interface CommonConstants {
     Integer ERROR = 9;
     Integer ORDER_STATUS_RETIRE = 4;
     Integer ORDER_STATUS_SEND_TOKEN = 2;
+    String TRANSFER_USER_PWD_ERR = "交易密码错误";
 }

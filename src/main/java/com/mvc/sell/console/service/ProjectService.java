@@ -228,7 +228,7 @@ public class ProjectService extends BaseService {
 
     private void checkAccount(WithdrawDTO withdrawDTO) {
         AccountVO account = accountService.get(getUserId());
-        Assert.isTrue(null != account && account.getTransactionPassword().equalsIgnoreCase(withdrawDTO.getTransactionPassword()), CommonConstants.USER_PWD_ERR);
+        Assert.isTrue(encoder.matches(withdrawDTO.getTransactionPassword(), account.getTransactionPassword()), CommonConstants.TRANSFER_USER_PWD_ERR);
     }
 
     public Integer updateStatus() {
