@@ -28,8 +28,6 @@ public class BeanConfig {
 
     @Value("${service.geth}")
     public String WALLET_SERVICE;
-    @Autowired
-    TransactionService transactionService;
 
     @Bean
     public OkHttpClient okHttpClient() throws IOException {
@@ -39,6 +37,9 @@ public class BeanConfig {
                 .writeTimeout(120, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
                 .addInterceptor(new Interceptor() {
+                    @Autowired
+                    TransactionService transactionService;
+
                     @Override
                     public Response intercept(Chain chain) throws IOException {
                         Request originalRequest = chain.request();
