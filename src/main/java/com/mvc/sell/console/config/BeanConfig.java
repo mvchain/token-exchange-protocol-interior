@@ -1,9 +1,11 @@
 package com.mvc.sell.console.config;
 
+import com.mvc.sell.console.service.TransactionService;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,8 @@ public class BeanConfig {
 
     @Value("${service.geth}")
     public String WALLET_SERVICE;
+    @Autowired
+    TransactionService transactionService;
 
     @Bean
     public OkHttpClient okHttpClient() throws IOException {
@@ -40,7 +44,19 @@ public class BeanConfig {
                         Request originalRequest = chain.request();
                         Request requestWithUserAgent = originalRequest.newBuilder()
                                 .build();
-                        return chain.proceed(requestWithUserAgent);
+                        Response result = null;
+                        try {
+                            result = chain.proceed(requestWithUserAgent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            try {
+                                transactionService.startListen();
+                                return null;
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                        return result;
                     }
                 });
         return builder.build();

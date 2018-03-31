@@ -326,7 +326,7 @@ public class TransactionService extends BaseService {
         );
         while (true) {
             if (null == subscription || subscription.isUnsubscribed()) {
-                newListen();
+                historyListen();
                 Thread.sleep(1000);
             }
         }
