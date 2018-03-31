@@ -143,10 +143,15 @@ public class TransactionService extends BaseService {
     }
 
     public void startListen() throws InterruptedException {
-        // listen history transaction
-        historyListen();
-        // listen new transaction
-        newListen();
+        try {
+            // listen history transaction
+            historyListen();
+            // listen new transaction
+            newListen();
+        } catch (Exception e) {
+            Thread.sleep(10000);
+            startListen();
+        }
     }
 
     private void newListen() throws InterruptedException {
