@@ -291,12 +291,13 @@ public class ProjectService extends BaseService {
         Project project = getNotNullById(id);
         // 项目结束后可用, 使用一次此功能后或此项目代币开放提币后禁用
         Config config = configService.getConfigByTokenName(project.getTokenName());
-        Boolean canRetire = project.getStatus().equals(2) && project.getRetire().equals(0) && config.getRechargeStatus().equals(0);
+        Boolean canRetire = project.getStatus().equals(2) && project.getRetire().equals(0) && config.getWithdrawStatus().equals(0);
         Assert.isTrue(canRetire, MessageConstants.CANNOT_RETIRE);
         project.setRetire(1);
         projectMapper.updateByPrimaryKeySelective(project);
+        projectMapper.retireBalance(id);
+        projectMapper.retireToken(id, config.getId());
         orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_RETIRE);
-        projectMapper.retireBalance(getUserId(), id);
     }
 
     public List<Project> select(Project project) {
