@@ -47,6 +47,6 @@ public interface ProjectMapper extends Mapper<Project> {
     @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(eth_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 4) where token_id = 0")
     void retireBalance(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId);
 
-    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(token_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 2) WHERE token_id = #{tokenId}")
+    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(token_number), 0) FROM orders where user_id = capital.user_id and project_id = #{projectId} AND order_status = 2) WHERE token_id = #{tokenId}")
     void sendToken(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
 }
