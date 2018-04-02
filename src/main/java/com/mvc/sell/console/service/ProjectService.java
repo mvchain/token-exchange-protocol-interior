@@ -154,7 +154,7 @@ public class ProjectService extends BaseService {
         orders.setUserId(getUserId());
         orders.setProjectId(projectId);
         Integer orderNum = orderMapper.selectCount(orders);
-        Integer buyerNum = orderNum == 0 ? 1 : 0;
+        Integer buyerNum = orderNum == 1 ? 1 : 0;
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(projectId);
         projectSold.setSoldEth(ethNumber);
