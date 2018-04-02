@@ -44,6 +44,7 @@ public class ConfigService extends BaseService {
     public void update(Config config) {
         insert(config);
         configMapper.updateByPrimaryKeySelective(config);
+        setUnit(config.getId(), config.getDecimals());
     }
 
     public List<String> token() {
