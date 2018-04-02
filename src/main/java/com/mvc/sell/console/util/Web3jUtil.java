@@ -48,7 +48,8 @@ public class Web3jUtil {
         if (tokenId.equals(BigInteger.ZERO)) {
             return Convert.fromWei(new BigDecimal(value), Convert.Unit.ETHER);
         }
-        Convert.Unit unit = (Convert.Unit) redisTemplate.opsForValue().get(RedisConstants.UNIT + "#" + tokenId);
+        String name = redisTemplate.opsForValue().get(RedisConstants.UNIT + "#" + tokenId).toString();
+        Convert.Unit unit = Convert.Unit.valueOf(name);
         return Convert.fromWei(new BigDecimal(value), unit);
     }
 
@@ -56,7 +57,8 @@ public class Web3jUtil {
         if (null == tokenId || BigInteger.ZERO.equals(tokenId)) {
             return Convert.toWei(realNumber, Convert.Unit.ETHER).toBigInteger();
         } else {
-            Convert.Unit unit = (Convert.Unit) redisTemplate.opsForValue().get(RedisConstants.UNIT + "#" + tokenId);
+            String name = redisTemplate.opsForValue().get(RedisConstants.UNIT + "#" + tokenId).toString();
+            Convert.Unit unit = Convert.Unit.valueOf(name);
             return Convert.toWei(realNumber, unit).toBigInteger();
         }
     }

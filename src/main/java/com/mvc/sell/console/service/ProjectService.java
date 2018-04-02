@@ -207,7 +207,7 @@ public class ProjectService extends BaseService {
         String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
         use = null == use ? BigDecimal.ZERO : use;
-        Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) > 0;
+        Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) >= 0;
         Assert.isTrue(canWithdraw, CommonConstants.NOT_ENOUGH);
     }
 
