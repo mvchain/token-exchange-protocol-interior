@@ -5,6 +5,7 @@ import com.mvc.sell.console.pojo.bean.ProjectSold;
 import com.mvc.sell.console.pojo.dto.MyProjectDTO;
 import com.mvc.sell.console.pojo.vo.MyProjectVO;
 import com.mvc.sell.console.pojo.vo.ProjectInfoVO;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -47,6 +48,6 @@ public interface ProjectMapper extends Mapper<Project> {
     @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(eth_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 4) where token_id = 0")
     void retireBalance(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId);
 
-    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(token_number), 0) FROM orders where user_id = capital.user_id and project_id = #{projectId} AND order_status = 2) WHERE token_id = #{tokenId}")
-    void sendToken(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
+    @Insert("insert IGNORE INTO capital SELECT null, user_id, #{tokenId}, IFNULL(sum(token_number),0) number FROM orders WHERE order_status = 0 AND project_id = #{projectId} GROUP BY user_id ON DUPLICATE KEY UPDATE balance = balance + IFNULL((SELECT sum(token_number),0) number FROM orders WHERE order_status = 0 AND project_id = #{projectId})")
+    void sendToken(@Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
 }

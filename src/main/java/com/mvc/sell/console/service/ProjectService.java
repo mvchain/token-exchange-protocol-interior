@@ -263,8 +263,8 @@ public class ProjectService extends BaseService {
         Assert.isTrue(canSend, MessageConstants.CANNOT_SEND_TOKEN);
         project.setSendToken(1);
         projectMapper.updateByPrimaryKeySelective(project);
+        projectMapper.sendToken(id, config.getId());
         orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_SEND_TOKEN);
-        projectMapper.sendToken(getUserId(), id, config.getId());
     }
 
     public void retire(BigInteger id, Integer retire) {
