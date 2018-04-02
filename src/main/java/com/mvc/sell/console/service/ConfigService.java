@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ConfigService
@@ -21,6 +23,14 @@ public class ConfigService extends BaseService {
 
     public List<Config> list() {
         return configMapper.selectAll();
+    }
+
+    public Map<String, Config> map() {
+        Map<String, Config> map = new HashMap<>();
+        for (Config config : configMapper.selectAll()) {
+            map.put(config.getTokenName(), config);
+        }
+        return  map;
     }
 
     public void insert(Config config) {

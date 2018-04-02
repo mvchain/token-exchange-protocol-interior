@@ -19,13 +19,20 @@ import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * project service
  *
  * @author qiyichen
  * @create 2018/3/13 11:25
+ *
+ * Added withdraw availability(status) of the token of the project symbol in the list.
+ *
+ * @author dreamingodd
+ * @updated 2018/4/2
  */
 @Service
 public class ProjectService extends BaseService {
@@ -42,7 +49,16 @@ public class ProjectService extends BaseService {
     public PageInfo<ProjectVO> list() {
         List<Project> list = projectMapper.selectAll();
         PageInfo<Project> page = new PageInfo<>(list);
-        return (PageInfo<ProjectVO>) BeanUtil.beanList2VOList(page, ProjectVO.class);
+        PageInfo<ProjectVO> voPage = (PageInfo<ProjectVO>) BeanUtil.beanList2VOList(page, ProjectVO.class);
+        Map<String, Config> configMap = configService.map();
+        for (ProjectVO projectVO : voPage.getList()) {
+            projectVO.setTokenWithdrawStatus(0);
+            Config config = configMap.get(projectVO.getTokenName());
+            if (config != null) {
+                projectVO.setTokenWithdrawStatus(config.getWithdrawStatus());
+            }
+        }
+        return voPage;
     }
 
     public void insert(ProjectDTO projectDTO) {

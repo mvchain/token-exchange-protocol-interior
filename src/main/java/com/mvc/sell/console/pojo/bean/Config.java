@@ -16,7 +16,9 @@ import java.util.Date;
 public class Config {
     @Id
     private BigInteger id;
+    /** 1 - available */
     private Integer rechargeStatus;
+    /** 1 - available */
     private Integer withdrawStatus;
     private Float min;
     private Float max;
