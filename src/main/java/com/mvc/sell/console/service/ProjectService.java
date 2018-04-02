@@ -198,6 +198,10 @@ public class ProjectService extends BaseService {
         transaction.setFromAddress(defaultUser);
         transactionMapper.insert(transaction);
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.subtract(withdrawDTO.getNumber()));
+        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
+        BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
+        use = use == null ? withdrawDTO.getNumber():use.add(withdrawDTO.getNumber());
+        redisTemplate.opsForValue().set(key, use);
     }
 
     private void checkCanWithdraw(WithdrawDTO withdrawDTO, Config config) {
