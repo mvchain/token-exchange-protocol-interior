@@ -3,7 +3,6 @@ package com.mvc.sell.console.util;
 import com.mvc.sell.console.constants.RedisConstants;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.web3j.protocol.core.methods.response.Transaction;
-import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

@@ -2,8 +2,8 @@ package com.mvc.sell.console.service;
 
 import com.mvc.sell.console.constants.RedisConstants;
 import com.mvc.sell.console.pojo.bean.Config;
+import com.mvc.sell.console.util.Convert;
 import org.springframework.stereotype.Service;
-import org.web3j.utils.Convert;
 
 import java.math.BigInteger;
 import java.util.Arrays;
