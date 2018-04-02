@@ -48,6 +48,6 @@ public interface ProjectMapper extends Mapper<Project> {
     @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(eth_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 4) where token_id = 0")
     void retireBalance(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId);
 
-    @Insert("insert IGNORE INTO capital SELECT null, user_id, #{tokenId}, IFNULL(sum(token_number),0) number FROM orders WHERE order_status = 0 AND project_id = #{projectId} GROUP BY user_id ON DUPLICATE KEY UPDATE balance = balance + IFNULL((SELECT sum(token_number),0) number FROM orders WHERE order_status = 0 AND project_id = #{projectId})")
+    @Insert("insert IGNORE INTO capital SELECT null, user_id, #{tokenId}, IFNULL(sum(token_number),0) number FROM orders WHERE order_status = 0 AND project_id = #{projectId} GROUP BY user_id ON DUPLICATE KEY UPDATE balance = balance + IFNULL((SELECT sum(token_number) number FROM orders WHERE order_status = 0 AND project_id = #{projectId}),0)")
     void sendToken(@Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
 }
