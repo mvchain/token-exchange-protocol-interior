@@ -45,8 +45,11 @@ public interface ProjectMapper extends Mapper<Project> {
     @Update("update project_sold set buyer_num = buyer_num+#{buyerNum}, sold_eth = sold_eth + #{soldEth} where id = #{id}")
     void updateSoldBalance(ProjectSold projectSold);
 
-    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(eth_number), 0) FROM orders where user_id = #{userId} and project_id = #{projectId} AND order_status = 4) where token_id = 0")
-    void retireBalance(@Param("userId") BigInteger userId, @Param("projectId") BigInteger projectId);
+    @Update("UPDATE capital SET balance = balance + (SELECT IFNULL(sum(eth_number), 0) FROM orders where user_id = capital.user_id and project_id = #{projectId}) where token_id = 0")
+    void retireBalance(@Param("projectId") BigInteger projectId);
+
+    @Update("UPDATE capital SET balance = balance - (SELECT IFNULL(sum(token_number), 0) FROM orders where user_id = capital.user_id and project_id = #{projectId} AND order_status = 2) where token_id = #{tokenId}")
+    void retireToken(@Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
 
     @Select("insert IGNORE INTO capital SELECT null, user_id, #{tokenId}, IFNULL(sum(token_number),0) number FROM orders WHERE order_status = 0 AND project_id = #{projectId} GROUP BY user_id ON DUPLICATE KEY UPDATE balance = balance + IFNULL((SELECT sum(token_number) number FROM orders WHERE order_status = 0 AND project_id = #{projectId}),0)")
     void sendToken(@Param("projectId") BigInteger projectId, @Param("tokenId") BigInteger tokenId);
