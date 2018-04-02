@@ -119,7 +119,7 @@ public class ProjectService extends BaseService {
         ProjectVO project = get(buyDTO.getProjectId());
         Assert.notNull(project, CommonConstants.PROJECT_NOT_EXIST);
         BigDecimal sold = getSold(buyDTO.getProjectId()).getSoldEth();
-        Assert.isTrue(sold.add(buyDTO.getEthNumber()).compareTo(project.getEthNumber()) < 0, MessageConstants.ETH_OVER);
+        Assert.isTrue(sold.add(buyDTO.getEthNumber()).compareTo(project.getEthNumber()) <= 0, MessageConstants.ETH_OVER);
         BigDecimal balance = buyDTO.getEthNumber().multiply(new BigDecimal(project.getRatio()));
         // update ethBalance
         Capital ethCapital = new Capital();
