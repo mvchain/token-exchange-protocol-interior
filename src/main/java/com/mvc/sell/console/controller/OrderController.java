@@ -30,7 +30,7 @@ public class OrderController extends BaseController {
     }
 
     @ApiOperation("取消订单9,目前手动传入方便后续扩展")
-    @PutMapping("{id}/orderStatus/{orderStatus}")
+    @PutMapping("{orderId}/orderStatus/{orderStatus}")
     @NeedLogin
     Result updateStatus(@PathVariable BigInteger orderId, @PathVariable Integer orderStatus) {
         orderService.updateStatus(orderId, orderStatus);
