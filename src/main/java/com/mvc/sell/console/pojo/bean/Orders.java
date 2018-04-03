@@ -2,6 +2,7 @@ package com.mvc.sell.console.pojo.bean;
 
 import lombok.Data;
 
+import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Data
 public class Orders {
-
+    @Id
     private BigInteger id;
     private String orderId;
     private Date createdAt;
