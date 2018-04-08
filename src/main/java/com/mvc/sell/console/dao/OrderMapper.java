@@ -22,7 +22,7 @@ public interface OrderMapper extends Mapper<Orders> {
     @Select("SELECT project_id FROM orders WHERE user_id = #{userId} GROUP BY project_id")
     List<BigInteger> getUserProject(BigInteger userId);
 
-    @Update("update orders set order_status = #{orderStatus} where project_id = #{projectId}")
+    @Update("update orders set order_status = #{orderStatus} where project_id = #{projectId} and order_status = 0")
     void updateStatusByProject(@Param("projectId") BigInteger projectId, @Param("orderStatus") Integer orderStatus);
 
     @Select({"<script>",
