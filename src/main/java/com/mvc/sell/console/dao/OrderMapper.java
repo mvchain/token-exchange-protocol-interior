@@ -25,6 +25,9 @@ public interface OrderMapper extends Mapper<Orders> {
     @Update("update orders set order_status = #{orderStatus} where project_id = #{projectId} and order_status = 0")
     void updateStatusByProject(@Param("projectId") BigInteger projectId, @Param("orderStatus") Integer orderStatus);
 
+    @Update("update orders set order_status = #{orderStatus} where project_id = #{projectId} and order_status in(0,2)")
+    void retireToken(BigInteger id, Integer orderStatusRetire);
+
     @Select({"<script>",
             "select t1.*, t2.title project_name, t2.status, t2.send_token, t2.retire from orders t1, project t2 where t1.project_id = t2.id ",
             "<when test=\"status!=null\">",
@@ -47,4 +50,6 @@ public interface OrderMapper extends Mapper<Orders> {
             "</when>",
             "</script>"})
     List<OrderVO> listByProject(OrderDTO orderDTO);
+
+
 }

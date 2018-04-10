@@ -49,4 +49,8 @@ public class OrderService extends BaseService {
     public void updateStatusByProject(BigInteger id, Integer orderStatusRetire) {
         orderMapper.updateStatusByProject(id, orderStatusRetire);
     }
+
+    public void retireToken(BigInteger id, Integer orderStatusRetire) {
+        orderMapper.retireToken(id, orderStatusRetire);
+    }
 }

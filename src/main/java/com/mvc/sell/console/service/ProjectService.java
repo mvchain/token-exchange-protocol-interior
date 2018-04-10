@@ -297,7 +297,7 @@ public class ProjectService extends BaseService {
         projectMapper.updateByPrimaryKeySelective(project);
         projectMapper.retireBalance(id);
         projectMapper.retireToken(id, config.getId());
-        orderService.updateStatusByProject(id, CommonConstants.ORDER_STATUS_RETIRE);
+        orderService.retireToken(id, CommonConstants.ORDER_STATUS_RETIRE);
     }
 
     public List<Project> select(Project project) {
