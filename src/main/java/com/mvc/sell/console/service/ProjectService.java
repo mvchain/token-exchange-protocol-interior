@@ -295,9 +295,13 @@ public class ProjectService extends BaseService {
         Assert.isTrue(canRetire, MessageConstants.CANNOT_RETIRE);
         project.setRetire(1);
         projectMapper.updateByPrimaryKeySelective(project);
-        projectMapper.retireBalance(id);
-        projectMapper.retireToken(id, config.getId());
-        orderService.retireToken(id, CommonConstants.ORDER_STATUS_RETIRE);
+        Orders orders = new Orders();
+        orders.setProjectId(id);
+        if (orderMapper.selectCount(orders) > 0){
+            projectMapper.retireBalance(id);
+            projectMapper.retireToken(id, config.getId());
+            orderService.retireToken(id, CommonConstants.ORDER_STATUS_RETIRE);
+        }
     }
 
     public List<Project> select(Project project) {
