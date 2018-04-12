@@ -169,12 +169,10 @@ public class ProjectService extends BaseService {
         Orders orders = new Orders();
         orders.setUserId(getUserId());
         orders.setProjectId(projectId);
-        Integer orderNum = orderMapper.selectCount(orders);
-        Integer buyerNum = orderNum == 1 ? 1 : 0;
         ProjectSold projectSold = new ProjectSold();
         projectSold.setId(projectId);
         projectSold.setSoldEth(ethNumber);
-        projectSold.setBuyerNum(buyerNum);
+        projectSold.setBuyerNum(1);
         projectMapper.updateSoldBalance(projectSold);
     }
 
