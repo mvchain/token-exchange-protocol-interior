@@ -29,7 +29,7 @@ public interface OrderMapper extends Mapper<Orders> {
     void retireToken(BigInteger id, Integer orderStatusRetire);
 
     @Select({"<script>",
-            "select t1.*, t2.title project_name, t2.status, t2.send_token, t2.retire from orders t1, project t2 where t1.project_id = t2.id ",
+            "select t1.*, t2.title project_name, t2.status, t2.send_token, t2.retire, t3.sold_eth, t2.eth_number project_eth_number from orders t1, project t2, project_sold t3 where t1.project_id = t2.id AND t2.id = t3.id ",
             "<when test=\"status!=null\">",
             "and t2.status = #{status}",
             "</when>",

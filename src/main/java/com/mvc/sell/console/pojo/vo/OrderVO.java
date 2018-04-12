@@ -31,5 +31,7 @@ public class OrderVO implements Serializable {
     private Integer status;
     private Integer retire;
     private Integer sendToken;
+    private BigDecimal projectEthNumber;
+    private BigDecimal soldEth;
 
 }
