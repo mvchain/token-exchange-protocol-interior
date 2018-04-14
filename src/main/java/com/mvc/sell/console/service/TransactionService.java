@@ -78,7 +78,7 @@ public class TransactionService extends BaseService {
     }
 
     public void approval(BigInteger id, Integer status) throws Exception {
-        Assert.isTrue(status != 2, MessageConstants.STATUS_ERROR);
+        Assert.isTrue(status != 2, MessageConstants.getMsg("STATUS_ERROR"));
         Transaction transaction = new Transaction();
         transaction.setId(id);
         transaction.setStatus(status);

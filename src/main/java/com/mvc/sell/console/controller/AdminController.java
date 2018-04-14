@@ -2,7 +2,6 @@ package com.mvc.sell.console.controller;
 
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
-import com.mvc.sell.console.common.annotation.Check;
 import com.mvc.sell.console.pojo.dto.AdminDTO;
 import com.mvc.sell.console.util.VerifyUtil;
 import io.swagger.annotations.ApiOperation;

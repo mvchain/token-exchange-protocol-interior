@@ -19,7 +19,6 @@ import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +26,10 @@ import java.util.Map;
  * project service
  *
  * @author qiyichen
- * @create 2018/3/13 11:25
- *
- * Added withdraw availability(status) of the token of the project symbol in the list.
- *
  * @author dreamingodd
+ * @create 2018/3/13 11:25
+ * <p>
+ * Added withdraw availability(status) of the token of the project symbol in the list.
  * @updated 2018/4/2
  */
 @Service
@@ -131,18 +129,18 @@ public class ProjectService extends BaseService {
     public void buy(BuyDTO buyDTO) {
         // update order number
         Account account = accountService.getAccount(getUserId());
-        Assert.isTrue(encoder.matches(buyDTO.getTransactionPassword(), account.getTransactionPassword()), MessageConstants.TRANSFER_PWD_ERR);
+        Assert.isTrue(encoder.matches(buyDTO.getTransactionPassword(), account.getTransactionPassword()), MessageConstants.getMsg("TRANSFER_PWD_ERR"));
         ProjectVO project = get(buyDTO.getProjectId());
-        Assert.notNull(project, CommonConstants.PROJECT_NOT_EXIST);
+        Assert.notNull(project, MessageConstants.getMsg("PROJECT_NOT_EXIST"));
         BigDecimal sold = getSold(buyDTO.getProjectId()).getSoldEth();
-        Assert.isTrue(sold.add(buyDTO.getEthNumber()).compareTo(project.getEthNumber()) <= 0, MessageConstants.ETH_OVER);
+        Assert.isTrue(sold.add(buyDTO.getEthNumber()).compareTo(project.getEthNumber()) <= 0, MessageConstants.getMsg("ETH_OVER"));
         BigDecimal balance = buyDTO.getEthNumber().multiply(new BigDecimal(project.getRatio()));
         // update ethBalance
         Capital ethCapital = new Capital();
         ethCapital.setUserId(getUserId());
         ethCapital.setTokenId(BigInteger.ZERO);
         Integer result = capitalMapper.updateEth(getUserId(), buyDTO.getEthNumber());
-        Assert.isTrue(result > 0, CommonConstants.ETH_NOT_ENOUGH);
+        Assert.isTrue(result > 0, MessageConstants.getMsg("ETH_NOT_ENOUGH"));
         // add order
         addOrder(buyDTO, balance);
         Integer orderNum = account.getOrderNum();
@@ -178,7 +176,7 @@ public class ProjectService extends BaseService {
 
     public WithdrawInfoVO getWithdrawConfig(String tokenName) {
         Config config = getConfig(tokenName);
-        Assert.notNull(config, CommonConstants.TOKEN_ERR);
+        Assert.notNull(config, MessageConstants.getMsg("TOKEN_ERR"));
         WithdrawInfoVO withdrawInfoVO = (WithdrawInfoVO) BeanUtil.copyProperties(config, new WithdrawInfoVO());
         Capital capital = new Capital();
         capital.setUserId(getUserId());
@@ -195,7 +193,7 @@ public class ProjectService extends BaseService {
         // check
         checkAccount(withdrawDTO);
         Config config = getConfig(withdrawDTO.getTokenName());
-        Assert.notNull(config, CommonConstants.TOKEN_ERR);
+        Assert.notNull(config, MessageConstants.getMsg("TOKEN_ERR"));
         checkCanWithdraw(withdrawDTO, config);
         checkEthBalance(withdrawDTO, config);
         // add trans
@@ -214,19 +212,19 @@ public class ProjectService extends BaseService {
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.subtract(withdrawDTO.getNumber()));
         String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
-        use = use == null ? withdrawDTO.getNumber():use.add(withdrawDTO.getNumber());
+        use = use == null ? withdrawDTO.getNumber() : use.add(withdrawDTO.getNumber());
         redisTemplate.opsForValue().set(key, use);
     }
 
     private void checkCanWithdraw(WithdrawDTO withdrawDTO, Config config) {
         String addressKey = RedisConstants.LISTEN_ETH_ADDR + "#" + withdrawDTO.getAddress();
         // 不能提现到临时地址
-        Assert.isTrue(!redisTemplate.hasKey(addressKey), MessageConstants.ADDERSS_ERROR);
+        Assert.isTrue(!redisTemplate.hasKey(addressKey), MessageConstants.getMsg("ADDRESS_ERROR"));
         String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
         use = null == use ? BigDecimal.ZERO : use;
         Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) >= 0;
-        Assert.isTrue(canWithdraw, CommonConstants.NOT_ENOUGH);
+        Assert.isTrue(canWithdraw, MessageConstants.getMsg("NOT_ENOUGH"));
     }
 
     private void checkEthBalance(WithdrawDTO withdrawDTO, Config config) {
@@ -234,7 +232,7 @@ public class ProjectService extends BaseService {
         capital.setTokenId(config.getId());
         capital.setUserId(getUserId());
         capital = capitalMapper.selectOne(capital);
-        Assert.isTrue(null != capital && capital.getBalance().compareTo(withdrawDTO.getNumber()) > 0, CommonConstants.ETH_NOT_ENOUGH);
+        Assert.isTrue(null != capital && capital.getBalance().compareTo(withdrawDTO.getNumber()) > 0, MessageConstants.getMsg("ETH_NOT_ENOUGH"));
     }
 
     private Config getConfig(String tokenName) {
@@ -247,7 +245,7 @@ public class ProjectService extends BaseService {
 
     private void checkAccount(WithdrawDTO withdrawDTO) {
         AccountVO account = accountService.get(getUserId());
-        Assert.isTrue(encoder.matches(withdrawDTO.getTransactionPassword(), account.getTransactionPassword()), CommonConstants.TRANSFER_USER_PWD_ERR);
+        Assert.isTrue(encoder.matches(withdrawDTO.getTransactionPassword(), account.getTransactionPassword()), MessageConstants.getMsg("TRANSFER_USER_PWD_ERR"));
     }
 
     public Integer updateStatus() {
@@ -269,7 +267,7 @@ public class ProjectService extends BaseService {
         project.setId(id);
         project = projectMapper.selectByPrimaryKey(project);
         // 项目开始前或项目发币后可用
-        Assert.notNull(project, MessageConstants.PROJECT_NOT_EXIST);
+        Assert.notNull(project, MessageConstants.getMsg("PROJECT_NOT_EXIST"));
         return project;
     }
 
@@ -278,7 +276,7 @@ public class ProjectService extends BaseService {
         Config config = configService.getConfigByTokenName(project.getTokenName());
         // 当前未发币且项目结束后可用
         Boolean canSend = project.getStatus().equals(2) && project.getSendToken() == 0;
-        Assert.isTrue(canSend, MessageConstants.CANNOT_SEND_TOKEN);
+        Assert.isTrue(canSend, MessageConstants.getMsg("CANNOT_SEND_TOKEN"));
         project.setSendToken(1);
         projectMapper.updateByPrimaryKeySelective(project);
         projectMapper.sendToken(id, config.getId());
@@ -290,12 +288,12 @@ public class ProjectService extends BaseService {
         // 项目结束后可用, 使用一次此功能后或此项目代币开放提币后禁用
         Config config = configService.getConfigByTokenName(project.getTokenName());
         Boolean canRetire = project.getStatus().equals(2) && project.getRetire().equals(0) && config.getWithdrawStatus().equals(0);
-        Assert.isTrue(canRetire, MessageConstants.CANNOT_RETIRE);
+        Assert.isTrue(canRetire, MessageConstants.getMsg("CANNOT_RETIRE"));
         project.setRetire(1);
         projectMapper.updateByPrimaryKeySelective(project);
         Orders orders = new Orders();
         orders.setProjectId(id);
-        if (orderMapper.selectCount(orders) > 0){
+        if (orderMapper.selectCount(orders) > 0) {
             projectMapper.retireBalance(id);
             projectMapper.retireToken(id, config.getId());
             orderService.retireToken(id, CommonConstants.ORDER_STATUS_RETIRE);
@@ -309,7 +307,7 @@ public class ProjectService extends BaseService {
     public void delete(BigInteger id) {
         Project project = getNotNullById(id);
         Boolean canDelete = project.getStatus().equals(0) || project.getSendToken().equals(1);
-        Assert.isTrue(canDelete, MessageConstants.CANNOT_DELETE);
+        Assert.isTrue(canDelete, MessageConstants.getMsg("CANNOT_DELETE"));
         projectMapper.delete(project);
     }
 }

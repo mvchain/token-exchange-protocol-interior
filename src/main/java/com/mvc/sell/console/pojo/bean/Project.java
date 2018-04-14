@@ -19,7 +19,7 @@ import java.util.Date;
 public class Project {
     @Id
     private BigInteger id;
-    @NotNull(message = MessageConstants.TITLE_EMPTY)
+    @NotNull(message = "{TITLE_EMPTY}")
     private String title;
     private String tokenName;
     private BigDecimal ethNumber;

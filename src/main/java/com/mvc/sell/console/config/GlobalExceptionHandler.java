@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.web3j.protocol.core.filters.FilterException;
 
 import javax.security.auth.login.LoginException;
 
@@ -27,13 +26,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LoginException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result loginExceptionException() {
-        return ResultGenerator.genFailResult(MessageConstants.TOKEN_ERROR_CODE, MessageConstants.TOKEN_EXPIRE);
+        return ResultGenerator.genFailResult(MessageConstants.TOKEN_ERROR_CODE, MessageConstants.getMsg("TOKEN_EXPIRE"));
     }
 
     @ExceptionHandler(TokenErrorException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result tokenErrorExceptionException() {
-        return ResultGenerator.genFailResult(MessageConstants.TOKEN_EXPIRE_CODE, MessageConstants.TOKEN_EXPIRE);
+        return ResultGenerator.genFailResult(MessageConstants.TOKEN_EXPIRE_CODE, MessageConstants.getMsg("TOKEN_EXPIRE"));
     }
 
     @ExceptionHandler(IllegalAccessException.class)

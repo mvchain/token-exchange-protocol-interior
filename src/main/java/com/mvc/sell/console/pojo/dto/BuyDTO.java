@@ -21,8 +21,8 @@ public class BuyDTO implements Serializable {
     private static final long serialVersionUID = 3760227948938685745L;
 
     private BigInteger projectId;
-    @DecimalMin(value = "0.1", message = MessageConstants.ETH_MIN)
-    @Digits(integer = 10, fraction = 1, message = MessageConstants.DIGIT_ERR)
+    @DecimalMin(value = "0.1", message = "{ETH_MIN}")
+    @Digits(integer = 10, fraction = 1, message = "{DIGIT_ERR}")
     private BigDecimal ethNumber;
     private String transactionPassword;
 

@@ -28,10 +28,10 @@ public class AdminService extends BaseService {
         Admin admin = new Admin();
         admin.setUsername(username);
         admin = adminMapper.selectOne(admin);
-        Assert.notNull(admin, MessageConstants.PWD_ERR);
+        Assert.notNull(admin, MessageConstants.getMsg("PWD_ERR"));
         boolean result = encoder.matches(adminDTO.getPassword(), admin.getPassword());
-        Assert.isTrue(result, MessageConstants.PWD_ERR);
-        Assert.isTrue(!CommonConstants.USER_FREEZE.equals(admin.getStatus()), "用户已冻结!");
+        Assert.isTrue(result, MessageConstants.getMsg("PWD_ERR"));
+        Assert.isTrue(!MessageConstants.getMsg("USER_FREEZE").equals(admin.getStatus()), "用户已冻结!");
         redisTemplate.opsForValue().set(RedisConstants.USER_STATUS, admin.getStatus());
         String token = JwtHelper.createToken(username, admin.getId());
         String refreshToken = JwtHelper.createRefresh(username, admin.getId());

@@ -81,7 +81,7 @@ public class JwtHelper {
         if (uri.indexOf("/refresh") > 0 && !"refresh".equalsIgnoreCase(type)) {
             throw new LoginException("token type is wrong");
         } else if (uri.indexOf("/refresh") < 0 && !"token".equalsIgnoreCase(type)) {
-            throw new TokenErrorException(MessageConstants.TOKEN_EXPIRE, MessageConstants.TOKEN_EXPIRE_CODE);
+            throw new TokenErrorException(MessageConstants.getMsg("TOKEN_EXPIRE"), MessageConstants.TOKEN_EXPIRE_CODE);
         }
     }
 }

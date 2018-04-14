@@ -54,9 +54,9 @@ public class ServiceAuthRestInterceptor extends HandlerInterceptorAdapter {
         Boolean isFeign = "feign".equalsIgnoreCase(request.getHeader("type")) && eurekaKey.equalsIgnoreCase(request.getHeader("eurekaKey"));
         if (null == claim && null != loginAnn && !isFeign) {
             if (uri.indexOf("/refresh") > 0 ){
-                throw new LoginException(MessageConstants.TOKEN_WRONG);
+                throw new LoginException(MessageConstants.getMsg("TOKEN_WRONG"));
             } else {
-                throw new TokenErrorException(MessageConstants.TOKEN_EXPIRE, MessageConstants.TOKEN_EXPIRE_CODE);
+                throw new TokenErrorException(MessageConstants.getMsg("TOKEN_EXPIRE"), MessageConstants.TOKEN_EXPIRE_CODE);
             }
         }
         if (null != claim) {

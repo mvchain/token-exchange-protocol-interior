@@ -2,7 +2,6 @@ package com.mvc.sell.console.service;
 
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.constants.MessageConstants;
-import com.mvc.sell.console.pojo.bean.Config;
 import com.mvc.sell.console.pojo.bean.Orders;
 import com.mvc.sell.console.pojo.dto.OrderDTO;
 import com.mvc.sell.console.pojo.vo.OrderVO;
@@ -38,7 +37,7 @@ public class OrderService extends BaseService {
         Orders orders = new Orders();
         orders.setId(orderId);
         orders = orderMapper.selectByPrimaryKey(orderId);
-        Assert.isTrue(orders.getOrderStatus() == 0, MessageConstants.CANNOT_CANCEL);
+        Assert.isTrue(orders.getOrderStatus() == 0, MessageConstants.getMsg("CANNOT_CANCEL"));
         orders.setOrderStatus(orderStatus);
         orderMapper.updateByPrimaryKeySelective(orders);
         tokenSoldMapper.updateEth(orders.getProjectId(), orders.getEthNumber());
