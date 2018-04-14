@@ -12,6 +12,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -22,7 +23,7 @@ public class LocaleConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
+        AcceptHeaderLocaleResolver slr = new AcceptHeaderLocaleResolver();
         // 默认语言
         slr.setDefaultLocale(Locale.US);
         return slr;
@@ -32,7 +33,6 @@ public class LocaleConfig extends WebMvcConfigurerAdapter {
     public LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
         // 参数名
-        lci.setParamName("lang");
         return lci;
     }
 
@@ -51,4 +51,5 @@ public class LocaleConfig extends WebMvcConfigurerAdapter {
         validator.setValidationMessageSource(rbms);
         return validator;
     }
+
 }

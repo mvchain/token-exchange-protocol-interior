@@ -105,6 +105,7 @@ public class ProjectController extends BaseController {
         projectService.delete(id);
         return ResultGenerator.genSuccessResult();
     }
+
     @ApiIgnore
     @PutMapping("{id}/status/{status}")
     @NeedLogin
@@ -112,6 +113,7 @@ public class ProjectController extends BaseController {
         projectService.updateStatus(id, status);
         return ResultGenerator.genSuccessResult();
     }
+
     @ApiIgnore
     @GetMapping("account/{id}")
     @NeedLogin
@@ -125,12 +127,14 @@ public class ProjectController extends BaseController {
     Result<PageInfo<MyProjectVO>> getListByUser(@ModelAttribute MyProjectDTO myProjectDTO) {
         return ResultGenerator.genSuccessResult(projectService.getListByUser(myProjectDTO));
     }
+
     @ApiIgnore
     @GetMapping("info/{id}")
     @NeedLogin
     Result<ProjectInfoVO> info(@PathVariable BigInteger id) {
         return ResultGenerator.genSuccessResult(projectService.info(id));
     }
+
     @ApiIgnore
     @PostMapping("buy")
     @NeedLogin
@@ -138,12 +142,14 @@ public class ProjectController extends BaseController {
         projectService.buy(buyDTO);
         return ResultGenerator.genSuccessResult();
     }
+
     @ApiIgnore
     @GetMapping("config")
     @NeedLogin
     Result<WithdrawInfoVO> getWithdrawConfig(@RequestParam String tokenName) {
         return ResultGenerator.genSuccessResult(projectService.getWithdrawConfig(tokenName));
     }
+
     @ApiIgnore
     @PostMapping("withdraw")
     @NeedLogin
