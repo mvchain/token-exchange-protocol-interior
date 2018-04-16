@@ -27,6 +27,7 @@ import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.Contract;
 import rx.Subscription;
@@ -61,6 +62,8 @@ public class TransactionService extends BaseService {
     String password;
     @Value("${wallet.user}")
     String defaultUser;
+    @Value("${wallet.coldUser}")
+    String coldUser;
     @Value("${wallet.eth}")
     BigDecimal ethLimit;
     @Autowired
@@ -77,7 +80,7 @@ public class TransactionService extends BaseService {
         return (PageInfo<TransactionVO>) BeanUtil.beanList2VOList(pageInfo, TransactionVO.class);
     }
 
-    public void approval(BigInteger id, Integer status) throws Exception {
+    public void approval(BigInteger id, Integer status, String hash) throws Exception {
         Assert.isTrue(status != 2, MessageConstants.getMsg("STATUS_ERROR"));
         Transaction transaction = new Transaction();
         transaction.setId(id);
@@ -85,7 +88,7 @@ public class TransactionService extends BaseService {
         transactionMapper.updateByPrimaryKeySelective(transaction);
         setBalance(id, status);
         // 发起提币
-        sendValue(id, status);
+        sendValue(id, status, hash);
     }
 
     private void setBalance(BigInteger id, Integer status) {
@@ -97,16 +100,23 @@ public class TransactionService extends BaseService {
         }
     }
 
-    private void sendValue(BigInteger id, Integer status) throws Exception {
+    private void sendValue(BigInteger id, Integer status, String hash) throws Exception {
         if (status.equals(1)) {
+            Assert.notNull(hash, "hash地址不能为空");
             Transaction transaction = new Transaction();
             transaction.setId(id);
             transaction = transactionMapper.selectByPrimaryKey(transaction);
-            String contractAddress = null;
-            BigInteger value = Web3jUtil.getWei(transaction.getRealNumber(), transaction.getTokenId(), redisTemplate);
-            contractAddress = getContractAddressByTokenId(transaction);
-            String hash = sendTransaction(defaultUser, transaction.getToAddress(), contractAddress, value, true);
+//            String contractAddress = null;
+//            BigInteger value = Web3jUtil.getWei(transaction.getRealNumber(), transaction.getTokenId(), redisTemplate);
+//            contractAddress = getContractAddressByTokenId(transaction);
+//            String hash = sendTransaction(defaultUser, transaction.getToAddress(), contractAddress, value, true);
             transaction.setHash(hash);
+            EthGetTransactionReceipt result = web3j.ethGetTransactionReceipt(hash).send();
+            if (null != result && null != result.getResult() && !result.hasError() && result.getTransactionReceipt().get().getStatus().equalsIgnoreCase("0x1")) {
+                transaction.setStatus(CommonConstants.STATUS_SUCCESS);
+            } else {
+                redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + hash, 1);
+            }
             transactionMapper.updateByPrimaryKeySelective(transaction);
         }
     }
@@ -241,10 +251,9 @@ public class TransactionService extends BaseService {
         transaction.setRealNumber(transaction.getNumber());
         transactionMapper.insertSelective(transaction);
         // update balance
-
         updateBalance(transaction);
         // transfer balance
-        this.transferBalance(transaction);
+        this.transferBalance(transaction, coldUser);
     }
 
     private void updateBalance(Transaction transaction) {
@@ -261,7 +270,7 @@ public class TransactionService extends BaseService {
     }
 
     @Async
-    public void transferBalance(Transaction transaction) {
+    public void transferBalance(Transaction transaction, String address) {
         try {
             EthGetBalance result = web3j.ethGetBalance(transaction.getToAddress(), DefaultBlockParameterName.LATEST).send();
             BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE);
@@ -274,7 +283,7 @@ public class TransactionService extends BaseService {
                 // erc20 token
                 sendBalance = contractService.balanceOf(contractAddress, transaction.getToAddress());
             }
-            sendTransaction(transaction.getToAddress(), defaultUser, contractAddress, sendBalance, false);
+            sendTransaction(transaction.getToAddress(), address, contractAddress, sendBalance, false);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -297,13 +306,12 @@ public class TransactionService extends BaseService {
             redisTemplate.opsForList().leftPush(RedisConstants.GAS_QUENE, transaction);
             return true;
         }
-        ;
         return false;
     }
 
     private BigInteger getTokenId(org.web3j.protocol.core.methods.response.Transaction tx) {
         if (Web3jUtil.isContractTx(tx)) {
-            BigInteger tokenId =  configService.getIdByContractAddress(tx.getTo());
+            BigInteger tokenId = configService.getIdByContractAddress(tx.getTo());
             return tokenId;
         } else {
             return BigInteger.ZERO;
@@ -354,7 +362,7 @@ public class TransactionService extends BaseService {
         Integer number = 0;
         while (redisTemplate.opsForList().size(RedisConstants.GAS_QUENE) > 0) {
             Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(RedisConstants.GAS_QUENE);
-            transferBalance(transaction);
+            transferBalance(transaction, defaultUser);
             number++;
         }
         return number;
