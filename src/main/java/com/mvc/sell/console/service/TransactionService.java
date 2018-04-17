@@ -368,4 +368,7 @@ public class TransactionService extends BaseService {
         return number;
     }
 
+    public void initConfig() {
+        configService.initUnit();
+    }
 }

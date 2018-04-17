@@ -92,4 +92,8 @@ public class ConfigService extends BaseService {
         config.setContractAddress(contractAddress);
         return configMapper.selectOne(config).getId();
     }
+
+    public void initUnit() {
+        configMapper.selectAll().stream().forEach(config -> setUnit(config.getId(), config.getDecimals()));
+    }
 }

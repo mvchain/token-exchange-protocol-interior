@@ -23,6 +23,7 @@ public class MyStartupRunner implements CommandLineRunner {
     @Override
     @Async
     public void run(String... args) throws InterruptedException {
+        transactionService.initConfig();
         transactionService.startListen();
     }
 
