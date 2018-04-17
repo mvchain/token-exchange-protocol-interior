@@ -152,10 +152,9 @@ public class TransactionService extends BaseService {
         return result.getTransactionHash();
     }
 
+    @Async
     public void startListen() throws InterruptedException {
         try {
-            // listen history transaction
-            historyListen();
             // listen new transaction
             newListen();
         } catch (Exception e) {
@@ -370,5 +369,16 @@ public class TransactionService extends BaseService {
 
     public void initConfig() {
         configService.initUnit();
+    }
+
+    @Async
+    public void startHistory() throws InterruptedException {
+        try {
+            // listen history transaction
+            historyListen();
+        } catch (Exception e) {
+            Thread.sleep(10000);
+            startHistory();
+        }
     }
 }

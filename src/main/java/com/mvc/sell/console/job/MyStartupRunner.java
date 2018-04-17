@@ -24,6 +24,7 @@ public class MyStartupRunner implements CommandLineRunner {
     @Async
     public void run(String... args) throws InterruptedException {
         transactionService.initConfig();
+        transactionService.startHistory();
         transactionService.startListen();
     }
 
