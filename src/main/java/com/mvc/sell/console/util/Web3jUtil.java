@@ -28,7 +28,7 @@ public class Web3jUtil {
             }
             // token transfer
             if (isContractTx(tx)) {
-                return tx.getInput().substring(34, 74);
+                return "0x" + tx.getInput().substring(34, 74);
             }
             return null;
         } catch (Exception e) {
