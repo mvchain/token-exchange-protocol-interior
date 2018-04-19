@@ -33,5 +33,6 @@ public class TransactionVO implements Serializable {
     private String hash;
     private Integer status;
     private Integer type;
+    private String tokenName;
 
 }

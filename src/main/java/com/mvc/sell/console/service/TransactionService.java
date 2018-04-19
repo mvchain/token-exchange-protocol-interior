@@ -77,7 +77,9 @@ public class TransactionService extends BaseService {
         Transaction transaction = (Transaction) BeanUtil.copyProperties(transactionDTO, new Transaction());
         List<Transaction> list = transactionMapper.select(transaction);
         PageInfo pageInfo = new PageInfo(list);
-        return (PageInfo<TransactionVO>) BeanUtil.beanList2VOList(pageInfo, TransactionVO.class);
+        PageInfo<TransactionVO> result = (PageInfo<TransactionVO>) BeanUtil.beanList2VOList(pageInfo, TransactionVO.class);
+        result.getList().forEach(obj -> obj.setTokenName(configService.getNameByTokenId(obj.getTokenId())));
+        return result;
     }
 
     public void approval(BigInteger id, Integer status, String hash) throws Exception {
@@ -164,10 +166,15 @@ public class TransactionService extends BaseService {
     }
 
     private void newListen() throws InterruptedException {
-        Subscription subscribe = web3j.transactionObservable().subscribe(
-                tx -> listenTx(tx, false),
-                getOnError()
-        );
+        Subscription subscribe = null;
+        try {
+            subscribe = web3j.transactionObservable().subscribe(
+                    tx -> listenTx(tx, false),
+                    getOnError()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         while (true) {
             if (null == subscribe || subscribe.isUnsubscribed()) {
                 Thread.sleep(10000);
@@ -245,7 +252,8 @@ public class TransactionService extends BaseService {
         transaction.setStatus(CommonConstants.STATUS_SUCCESS);
         transaction.setToAddress(to);
         transaction.setFromAddress(tx.getFrom());
-        transaction.setNumber(Web3jUtil.getValue(tx.getValue(), transaction.getTokenId(), redisTemplate));
+        BigInteger value = Web3jUtil.isContractTx(tx) ? new BigInteger(tx.getInput().substring(tx.getInput().length() - 64), 16) : tx.getValue();
+        transaction.setNumber(Web3jUtil.getValue(value, transaction.getTokenId(), redisTemplate));
         transaction.setPoundage(0f);
         transaction.setRealNumber(transaction.getNumber());
         transactionMapper.insertSelective(transaction);

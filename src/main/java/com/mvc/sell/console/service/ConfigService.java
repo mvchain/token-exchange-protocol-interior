@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ConfigService
@@ -20,6 +21,7 @@ import java.util.Map;
 @Service
 public class ConfigService extends BaseService {
 
+    ConcurrentHashMap<BigInteger, String> tokenMap = new ConcurrentHashMap<>();
 
     public List<Config> list() {
         return configMapper.selectAll();
@@ -30,7 +32,7 @@ public class ConfigService extends BaseService {
         for (Config config : configMapper.selectAll()) {
             map.put(config.getTokenName(), config);
         }
-        return  map;
+        return map;
     }
 
     public void insert(Config config) {
@@ -95,5 +97,13 @@ public class ConfigService extends BaseService {
 
     public void initUnit() {
         configMapper.selectAll().stream().forEach(config -> setUnit(config.getId(), config.getDecimals()));
+    }
+
+    public String getNameByTokenId(BigInteger tokenId) {
+        if (this.tokenMap.get(tokenId) == null) {
+            Config config = getByTokenId(tokenId);
+            this.tokenMap.put(tokenId, config.getTokenName());
+        }
+        return this.tokenMap.get(tokenId);
     }
 }
