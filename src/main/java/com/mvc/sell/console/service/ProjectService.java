@@ -147,6 +147,8 @@ public class ProjectService extends BaseService {
         orderNum = null == orderNum ? 1 : ++orderNum;
         account.setOrderNum(orderNum);
         accountService.update(account);
+        sold = getSold(buyDTO.getProjectId()).getSoldEth();
+        Assert.isTrue(sold.compareTo(project.getEthNumber()) <= 0, MessageConstants.getMsg("ETH_OVER"));
         String key = RedisConstants.USER_PROJECTS + "#" + getUserId();
         redisTemplate.opsForValue().set(key, orderMapper.getUserProject(getUserId()));
     }
