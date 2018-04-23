@@ -289,8 +289,8 @@ public class TransactionService extends BaseService {
             // add transaction queue
             transaction.setFromAddress(transaction.getToAddress());
             transaction.setToAddress(coldUser);
-            transaction.setNumber(new BigDecimal(sendBalance));
-            transaction.setRealNumber(new BigDecimal(sendBalance));
+            transaction.setNumber(Web3jUtil.getValue(sendBalance, transaction.getTokenId(), redisTemplate));
+            transaction.setRealNumber(transaction.getNumber());
             transaction.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
             redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
         } catch (Exception e) {
