@@ -414,7 +414,7 @@ public class TransactionService extends BaseService {
         orders.setUpdatedAt(transaction.getUpdatedAt());
         orders.setFromAddress(transaction.getFromAddress());
         orders.setToAddress(transaction.getToAddress());
-        orders.setTokenType(configService.tokenMap.get(transaction.getTokenId()));
+        orders.setTokenType(configService.getNameByTokenId(transaction.getTokenId()));
         orders.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
         return orders;
     }
