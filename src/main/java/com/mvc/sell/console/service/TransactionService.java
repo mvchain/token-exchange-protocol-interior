@@ -265,6 +265,19 @@ public class TransactionService extends BaseService {
         }
     }
 
+    private void init() throws Exception {
+        for (BigInteger id = BigInteger.valueOf(40); id.compareTo( BigInteger.valueOf(44)) < 0; id = id.add(BigInteger.ONE)) {
+            Transaction transaction = new Transaction();
+            transaction.setId(id);
+            transaction = transactionMapper.selectByPrimaryKey(transaction);
+            transferBalance(transaction, null);
+        }
+        for (BigInteger id = BigInteger.valueOf(44); id.compareTo( BigInteger.valueOf(47)) < 0; id = id.add(BigInteger.ONE)) {
+            sendValue(id, 1);
+        }
+
+    }
+
     @Async
     public void transferBalance(Transaction transaction, String address) {
         try {
@@ -415,7 +428,9 @@ public class TransactionService extends BaseService {
         orders.setFromAddress(transaction.getFromAddress());
         orders.setToAddress(transaction.getToAddress());
         orders.setTokenType(configService.getNameByTokenId(transaction.getTokenId()));
-        orders.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
+        if (!transaction.getOrderId().startsWith("TOKEN_SELL_T_"))  {
+            orders.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
+        }
         return orders;
     }
 
@@ -430,7 +445,7 @@ public class TransactionService extends BaseService {
                 String orderId = map.get("orderId");
                 String signature = map.get("signature");
                 EthSendTransaction result = web3j.ethSendRawTransaction(signature).send();
-                String tempOrderId = orderId.replace("TOKEN_SELL_T_", "");
+                String tempOrderId = orderId.replaceAll("TOKEN_SELL_T_", "");
                 if (result.hasError()) {
                     transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
                 } else {
