@@ -279,7 +279,7 @@ public class TransactionService extends BaseService {
             transaction.setNumber(new BigDecimal(sendBalance));
             transaction.setRealNumber(new BigDecimal(sendBalance));
             transaction.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
-            redisTemplate.opsForList().leftPush("TOKEN_SELL_TRANS", transaction);
+            redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -420,12 +420,12 @@ public class TransactionService extends BaseService {
     }
 
     public void importTransaction(List<Map> list) {
-        redisTemplate.opsForList().rightPushAll(CommonConstants.TOKEN_SELL_TRANS, list);
+        redisTemplate.opsForList().rightPushAll(CommonConstants.TOKEN_SELL_TRANS_LIST, list);
     }
 
     public void startTransaction() {
         try {
-            Map<String, String> map = (Map<String, String>) redisTemplate.opsForList().rightPop(CommonConstants.TOKEN_SELL_TRANS);
+            Map<String, String> map = (Map<String, String>) redisTemplate.opsForList().rightPop(CommonConstants.TOKEN_SELL_TRANS_LIST);
             if (null != map) {
                 String orderId = map.get("orderId");
                 String signature = map.get("signature");

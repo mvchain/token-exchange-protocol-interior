@@ -14,4 +14,5 @@ public interface CommonConstants {
     String TOKEN_SELL_USER = "TOKEN_SELL_USER";
     String TOKEN_SELL_TRANS_TEMP = "TOKEN_SELL_TRANS_TEMP";
     String TOKEN_SELL_TRANS = "TOKEN_SELL_TRANS";
+    String TOKEN_SELL_TRANS_LIST = "TOKEN_SELL_TRANS_LIST";
 }
