@@ -1,17 +1,29 @@
 package com.mvc.sell.console.controller;
 
+import com.alibaba.druid.support.json.JSONUtils;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.NeedLogin;
+import com.mvc.sell.console.constants.CommonConstants;
+import com.mvc.sell.console.pojo.bean.Orders;
 import com.mvc.sell.console.pojo.dto.HashDTO;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 
 /**
  * transaction controller
@@ -33,8 +45,47 @@ public class TransactionController extends BaseController {
     @ApiOperation("更新冲提状态 0待审核, 1等待提币(同意,同意后会直接发送,成功后刷新列表可看到hash), 2成功, 9拒绝")
     @PutMapping("{id}/status/{status}")
     @NeedLogin
-    Result approval(@PathVariable BigInteger id, @PathVariable Integer status, @RequestBody HashDTO hashDTO) throws Exception {
-        transactionService.approval(id, status, hashDTO.getHashAddress());
+    Result approval(@PathVariable BigInteger id, @PathVariable Integer status) throws Exception {
+        transactionService.approval(id, status);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @ApiOperation("导入账户")
+    @PostMapping(value = "import/account")
+    public Result<Long> importAccount(@RequestBody MultipartFile file) throws Exception {
+        String jsonStr = IOUtils.toString(file.getInputStream());
+        List<Map> list = JSON.parseArray(jsonStr, Map.class);
+        transactionService.importAccount(list);
+        return ResultGenerator.genSuccessResult();
+    }
+
+    @ApiOperation("获取剩余账户数量, 过少则需要新增导入")
+    @GetMapping(value = "account/size")
+    public Result<Long> getAccountSize() throws Exception {
+        Long size = transactionService.getAccountSize();
+        return ResultGenerator.genSuccessResult(size);
+    }
+
+    @ApiOperation("下载待处理数据")
+    @GetMapping("transaction/json")
+    void getTransactionJson(HttpServletResponse response) throws IOException {
+        List<com.mvc.sell.console.service.ethernum.Orders> accountList = transactionService.getTransactionJson();
+        response.setContentType("text/plain");
+        response.addHeader("Content-Disposition", "attachment; filename=" + String.format("transaction_%s.json", System.currentTimeMillis()));
+        OutputStream os = response.getOutputStream();
+        BufferedOutputStream buff = new BufferedOutputStream(os);
+        buff.write(JSONUtils.toJSONString(accountList).getBytes("UTF-8"));
+        buff.flush();
+        buff.close();
+        redisTemplate.delete(CommonConstants.TOKEN_SELL_TRANS_TEMP);
+    }
+
+    @ApiOperation("导入待处理交易")
+    @PostMapping(value = "import/transaction")
+    public Result<Long> importTransaction(@RequestBody MultipartFile file) throws Exception {
+        String jsonStr = IOUtils.toString(file.getInputStream());
+        List<Map> list = JSON.parseArray(jsonStr, Map.class);
+        transactionService.importTransaction(list);
         return ResultGenerator.genSuccessResult();
     }
 

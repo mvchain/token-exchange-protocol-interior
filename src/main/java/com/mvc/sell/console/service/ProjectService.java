@@ -43,6 +43,8 @@ public class ProjectService extends BaseService {
     OrderService orderService;
     @Value("${wallet.user}")
     String defaultUser;
+    @Value("${wallet.coldUser}")
+    String coldUser;
 
     public PageInfo<ProjectVO> list() {
         List<Project> list = projectMapper.selectAll();
@@ -209,7 +211,7 @@ public class ProjectService extends BaseService {
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
         transaction.setTokenId(config.getId());
-        transaction.setFromAddress(defaultUser);
+        transaction.setFromAddress(coldUser);
         transactionMapper.insert(transaction);
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.subtract(withdrawDTO.getNumber()));
         String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();

@@ -22,12 +22,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
-import org.web3j.protocol.admin.methods.response.NewAccountIdentifier;
 import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
-import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.Contract;
 import rx.Subscription;
@@ -36,7 +34,9 @@ import rx.functions.Action1;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TransactionService
@@ -82,7 +82,7 @@ public class TransactionService extends BaseService {
         return result;
     }
 
-    public void approval(BigInteger id, Integer status, String hash) throws Exception {
+    public void approval(BigInteger id, Integer status) throws Exception {
         Assert.isTrue(status != 2, MessageConstants.getMsg("STATUS_ERROR"));
         Transaction transaction = new Transaction();
         transaction.setId(id);
@@ -90,7 +90,7 @@ public class TransactionService extends BaseService {
         transactionMapper.updateByPrimaryKeySelective(transaction);
         setBalance(id, status);
         // 发起提币
-        sendValue(id, status, hash);
+        sendValue(id, status);
     }
 
     private void setBalance(BigInteger id, Integer status) {
@@ -102,24 +102,13 @@ public class TransactionService extends BaseService {
         }
     }
 
-    private void sendValue(BigInteger id, Integer status, String hash) throws Exception {
+    private void sendValue(BigInteger id, Integer status) throws Exception {
         if (status.equals(1)) {
-            Assert.notNull(hash, "hash地址不能为空");
             Transaction transaction = new Transaction();
             transaction.setId(id);
             transaction = transactionMapper.selectByPrimaryKey(transaction);
-//            String contractAddress = null;
-//            BigInteger value = Web3jUtil.getWei(transaction.getRealNumber(), transaction.getTokenId(), redisTemplate);
-//            contractAddress = getContractAddressByTokenId(transaction);
-//            String hash = sendTransaction(defaultUser, transaction.getToAddress(), contractAddress, value, true);
-            transaction.setHash(hash);
-            EthGetTransactionReceipt result = web3j.ethGetTransactionReceipt(hash).send();
-            if (null != result && null != result.getResult() && !result.hasError() && result.getTransactionReceipt().get().getStatus().equalsIgnoreCase("0x1")) {
-                transaction.setStatus(CommonConstants.STATUS_SUCCESS);
-            } else {
-                redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + hash, 1);
-            }
-            transactionMapper.updateByPrimaryKeySelective(transaction);
+            transaction.setNumber(transaction.getRealNumber());
+            redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
         }
     }
 
@@ -282,15 +271,13 @@ public class TransactionService extends BaseService {
             EthGetBalance result = web3j.ethGetBalance(transaction.getToAddress(), DefaultBlockParameterName.LATEST).send();
             BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE);
             BigInteger sendBalance = result.getBalance().subtract(needBalance);
-            if (sendGasIfNull(transaction, result, needBalance)) {
-                return;
-            }
-            String contractAddress = getContractAddressByTokenId(transaction);
-            if (!transaction.getTokenId().equals(BigInteger.ZERO)) {
-                // erc20 token
-                sendBalance = contractService.balanceOf(contractAddress, transaction.getToAddress());
-            }
-            sendTransaction(transaction.getToAddress(), address, contractAddress, sendBalance, false);
+            // send gas
+            sendGasIfNull(transaction, result, needBalance);
+            // add transaction queue
+            transaction.setFromAddress(transaction.getToAddress());
+            transaction.setToAddress(coldUser);
+            transaction.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
+            redisTemplate.opsForList().leftPush("TOKEN_SELL_TRANS", transaction);
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
@@ -298,7 +285,7 @@ public class TransactionService extends BaseService {
     }
 
     private boolean sendGasIfNull(Transaction transaction, EthGetBalance result, BigInteger needBalance) throws IOException {
-        if (!result.hasError() && result.getBalance().compareTo(BigInteger.ZERO) == 0) {
+        if (!result.hasError() && result.getBalance().compareTo(needBalance) < 0) {
             org.web3j.protocol.core.methods.request.Transaction trans = new org.web3j.protocol.core.methods.request.Transaction(
                     defaultUser,
                     null,
@@ -356,10 +343,11 @@ public class TransactionService extends BaseService {
         Account account = null;
         Integer num = 0;
         while (null != (account = accountService.getNonAddress())) {
-            NewAccountIdentifier result = admin.personalNewAccount(password).send();
-            account.setAddressEth(result.getAccountId());
+            String key = CommonConstants.TOKEN_SELL_USER;
+            String address = (String) redisTemplate.opsForList().rightPop(key);
+            account.setAddressEth(address);
             accountService.update(account);
-            redisTemplate.opsForValue().set(RedisConstants.LISTEN_ETH_ADDR + "#" + result.getAccountId(), account.getId());
+            redisTemplate.opsForValue().set(RedisConstants.LISTEN_ETH_ADDR + "#" + address, account.getId());
             num++;
         }
         return num;
@@ -387,6 +375,81 @@ public class TransactionService extends BaseService {
         } catch (Exception e) {
             Thread.sleep(10000);
             startHistory();
+        }
+    }
+
+    public void importAccount(List<Map> list) {
+        List accounts = redisTemplate.opsForList().range(CommonConstants.TOKEN_SELL_USER, 0, redisTemplate.opsForList().size(CommonConstants.TOKEN_SELL_USER));
+        list.stream().forEach(map -> {
+            String address = (String) map.get("address");
+            if (null != accounts && accounts.contains(address)) {
+                return;
+            }
+            redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_USER, address);
+        });
+    }
+
+    public Long getAccountSize() {
+        String key = CommonConstants.TOKEN_SELL_USER;
+        return redisTemplate.opsForList().size(key);
+    }
+
+    public List<com.mvc.sell.console.service.ethernum.Orders> getTransactionJson() {
+        String tempKey = CommonConstants.TOKEN_SELL_TRANS_TEMP;
+        String key = CommonConstants.TOKEN_SELL_TRANS;
+        List<com.mvc.sell.console.service.ethernum.Orders> result = new ArrayList<>();
+        List<Transaction> transactionsTemp = redisTemplate.opsForList().range(tempKey, 0, redisTemplate.opsForList().size(tempKey));
+        if (null == transactionsTemp) {
+            transactionsTemp = new ArrayList<>();
+        }
+        for (Transaction transaction : transactionsTemp) {
+            com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
+            result.add(orders);
+        }
+        while (redisTemplate.opsForList().size(key) > 0) {
+            Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(key);
+            redisTemplate.opsForList().leftPush(tempKey, transaction);
+            com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
+            result.add(orders);
+        }
+        return result;
+    }
+
+    private com.mvc.sell.console.service.ethernum.Orders getOrders(Transaction transaction) {
+        com.mvc.sell.console.service.ethernum.Orders orders = new com.mvc.sell.console.service.ethernum.Orders();
+        orders.setValue(transaction.getNumber());
+        orders.setCreatedAt(transaction.getCreatedAt());
+        orders.setUpdatedAt(transaction.getUpdatedAt());
+        orders.setFromAddress(transaction.getFromAddress());
+        orders.setToAddress(transaction.getToAddress());
+        orders.setTokenType(configService.tokenMap.get(transaction.getTokenId()));
+        orders.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
+        return orders;
+    }
+
+    public void importTransaction(List<Map> list) {
+        redisTemplate.opsForList().rightPushAll(CommonConstants.TOKEN_SELL_TRANS, list);
+    }
+
+    public void startTransaction() {
+        try {
+            Map<String, String> map = (Map<String, String>) redisTemplate.opsForList().rightPop(CommonConstants.TOKEN_SELL_TRANS);
+            if (null != map) {
+                String orderId = map.get("orderId");
+                String signature = map.get("signature");
+                EthSendTransaction result = web3j.ethSendRawTransaction(signature).send();
+                String tempOrderId = orderId.replace("TOKEN_SELL_T_", "");
+                if (result.hasError()) {
+                    transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
+                } else {
+                    transactionMapper.updateHashByOrderId(tempOrderId, result.getTransactionHash());
+                }
+            }
+            Thread.sleep(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

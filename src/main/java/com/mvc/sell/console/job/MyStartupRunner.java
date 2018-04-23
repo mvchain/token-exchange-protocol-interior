@@ -26,6 +26,10 @@ public class MyStartupRunner implements CommandLineRunner {
         transactionService.initConfig();
         transactionService.startHistory();
         transactionService.startListen();
+        while (true) {
+            transactionService.startTransaction();
+            Thread.sleep(1);
+        }
     }
 
 }

@@ -2,6 +2,9 @@ package com.mvc.sell.console.util;
 
 import java.math.BigDecimal;
 
+/**
+ * @author ethands
+ */
 public final class Convert {
     private Convert() {
     }
