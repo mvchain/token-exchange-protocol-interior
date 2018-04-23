@@ -276,6 +276,8 @@ public class TransactionService extends BaseService {
             // add transaction queue
             transaction.setFromAddress(transaction.getToAddress());
             transaction.setToAddress(coldUser);
+            transaction.setNumber(new BigDecimal(sendBalance));
+            transaction.setRealNumber(new BigDecimal(sendBalance));
             transaction.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
             redisTemplate.opsForList().leftPush("TOKEN_SELL_TRANS", transaction);
         } catch (Exception e) {
@@ -351,16 +353,6 @@ public class TransactionService extends BaseService {
             num++;
         }
         return num;
-    }
-
-    public Integer sendGas() {
-        Integer number = 0;
-        while (redisTemplate.opsForList().size(RedisConstants.GAS_QUENE) > 0) {
-            Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(RedisConstants.GAS_QUENE);
-            transferBalance(transaction, defaultUser);
-            number++;
-        }
-        return number;
     }
 
     public void initConfig() {
