@@ -1,14 +1,11 @@
 package com.mvc.sell.console.controller;
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.NeedLogin;
 import com.mvc.sell.console.constants.CommonConstants;
-import com.mvc.sell.console.pojo.bean.Orders;
-import com.mvc.sell.console.pojo.dto.HashDTO;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import io.swagger.annotations.ApiOperation;
@@ -74,7 +71,7 @@ public class TransactionController extends BaseController {
         response.addHeader("Content-Disposition", "attachment; filename=" + String.format("transaction_%s.json", System.currentTimeMillis()));
         OutputStream os = response.getOutputStream();
         BufferedOutputStream buff = new BufferedOutputStream(os);
-        buff.write(JSONUtils.toJSONString(accountList).getBytes("UTF-8"));
+        buff.write(JSON.toJSONString(accountList).getBytes("UTF-8"));
         buff.flush();
         buff.close();
         redisTemplate.delete(CommonConstants.TOKEN_SELL_TRANS_TEMP);

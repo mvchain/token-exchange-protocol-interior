@@ -198,6 +198,8 @@ public class ProjectService extends BaseService {
         checkAccount(withdrawDTO);
         Config config = getConfig(withdrawDTO.getTokenName());
         Assert.notNull(config, MessageConstants.getMsg("TOKEN_ERR"));
+        BigDecimal realNumber = withdrawDTO.getNumber().subtract(BigDecimal.valueOf(config.getPoundage()));
+        Assert.isTrue(realNumber.compareTo(BigDecimal.ZERO) >= 0, MessageConstants.getMsg("ETH_NOT_ENOUGH"));
         checkCanWithdraw(withdrawDTO, config);
         checkEthBalance(withdrawDTO, config);
         // add trans
@@ -206,7 +208,7 @@ public class ProjectService extends BaseService {
         transaction.setNumber(withdrawDTO.getNumber());
         transaction.setOrderId(getOrderId(CommonConstants.ORDER_WITHDRAW));
         transaction.setPoundage(config.getPoundage());
-        transaction.setRealNumber(withdrawDTO.getNumber().subtract(BigDecimal.valueOf(config.getPoundage())));
+        transaction.setRealNumber(realNumber);
         transaction.setToAddress(withdrawDTO.getAddress());
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
