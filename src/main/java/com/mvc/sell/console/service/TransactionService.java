@@ -34,9 +34,8 @@ import rx.functions.Action1;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TransactionService
@@ -271,7 +270,7 @@ public class TransactionService extends BaseService {
     public void transferBalance(final Transaction transaction, String address) {
         try {
             EthGetBalance result = web3j.ethGetBalance(transaction.getToAddress(), DefaultBlockParameterName.LATEST).send();
-            BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE);
+            BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE).multiply(BigInteger.valueOf(10));
             BigInteger sendBalance = transaction.getTokenId().equals(BigInteger.ZERO) ? result.getBalance().subtract(needBalance) : Web3jUtil.getWei(transaction.getNumber(), transaction.getTokenId(), redisTemplate);
             // send gas
             sendGasIfNull(transaction, result, needBalance);
@@ -406,7 +405,8 @@ public class TransactionService extends BaseService {
             com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
             result.add(orders);
         }
-        return result;
+        Collections.reverse(result);
+        return result.stream().distinct().collect(Collectors.toList());
     }
 
     private com.mvc.sell.console.service.ethernum.Orders getOrders(Transaction transaction) {
@@ -434,10 +434,10 @@ public class TransactionService extends BaseService {
             Map<String, String> map = (Map<String, String>) redisTemplate.opsForList().rightPop(CommonConstants.TOKEN_SELL_TRANS_LIST);
             if (null != map) {
                 String orderId = map.get("orderId");
-                if (orderId.startsWith("T")) {
-                    String signature = map.get("signature");
-                    EthSendTransaction result = web3j.ethSendRawTransaction(signature).send();
-                    String tempOrderId = orderId.replaceAll("TOKEN_SELL_T_", "");
+                String signature = map.get("signature");
+                EthSendTransaction result = web3j.ethSendRawTransaction(signature).send();
+                String tempOrderId = orderId.replaceAll("TOKEN_SELL_T_", "");
+                if (tempOrderId.startsWith("T")) {
                     if (result.hasError()) {
                         transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
                     } else {

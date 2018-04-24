@@ -25,4 +25,21 @@ public class Orders {
     private BigInteger missionId;
     private String signature;
 
+    @Override
+    public boolean equals(Object anObject) {
+        String o = orderId.startsWith("TOKEN_SELL_T_C") && "ETH".equalsIgnoreCase(tokenType) ? "TOKEN_SELL_T_C" : orderId;
+        if (anObject instanceof Orders) {
+            Orders obj = (Orders) anObject;
+            String ob = obj.orderId.startsWith("TOKEN_SELL_T_C") && "ETH".equalsIgnoreCase(obj.tokenType) ? "TOKEN_SELL_T_C" : obj.orderId;
+            return o.equals(ob);
+        }
+        return super.equals(anObject);
+    }
+
+    @Override
+    public int hashCode() {
+        String o = orderId.startsWith("TOKEN_SELL_T_C") && "ETH".equalsIgnoreCase(tokenType) ? "TOKEN_SELL_T_C" : orderId;
+        return o.hashCode();
+    }
+
 }
