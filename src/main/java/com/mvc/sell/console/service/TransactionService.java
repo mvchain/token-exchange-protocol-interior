@@ -216,7 +216,7 @@ public class TransactionService extends BaseService {
     }
 
     private void addressHandler(org.web3j.protocol.core.methods.response.Transaction tx) {
-        String to = Web3jUtil.getTo(tx);
+       String to = Web3jUtil.getTo(tx);
         if (to == null) {
             return;
         }
@@ -268,8 +268,7 @@ public class TransactionService extends BaseService {
         }
     }
 
-    @Async
-    public void transferBalance(Transaction transaction, String address) {
+    public void transferBalance(final Transaction transaction, String address) {
         try {
             EthGetBalance result = web3j.ethGetBalance(transaction.getToAddress(), DefaultBlockParameterName.LATEST).send();
             BigInteger needBalance = TransactionService.DEFAULT_GAS_LIMIT.multiply(TransactionService.DEFAULT_GAS_PRICE);
