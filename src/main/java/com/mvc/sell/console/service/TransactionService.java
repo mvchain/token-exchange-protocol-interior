@@ -419,6 +419,8 @@ public class TransactionService extends BaseService {
         orders.setTokenType(configService.getNameByTokenId(transaction.getTokenId()));
         if (!transaction.getOrderId().startsWith("TOKEN_SELL_T_")) {
             orders.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
+        } else {
+            orders.setOrderId(transaction.getOrderId());
         }
         return orders;
     }
