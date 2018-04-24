@@ -15,6 +15,6 @@ public interface TransactionMapper extends Mapper<Transaction> {
     @Update("update transaction set status = #{status} where order_id = #{orderId}")
     void updateStatusByOrderId(@Param("orderId") String tempOrderId, @Param("status") Integer status);
 
-    @Update("update transaction set hash = #{hash} where order_id = #{orderId}")
+    @Update("update transaction set hash = #{hash} where order_id = #{orderId} and hash is null")
     void updateHashByOrderId(@Param("orderId") String tempOrderId, @Param("hash") String transactionHash);
 }
