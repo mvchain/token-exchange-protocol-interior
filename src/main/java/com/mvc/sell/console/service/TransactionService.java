@@ -216,7 +216,7 @@ public class TransactionService extends BaseService {
     }
 
     private void addressHandler(org.web3j.protocol.core.methods.response.Transaction tx) {
-       String to = Web3jUtil.getTo(tx);
+        String to = Web3jUtil.getTo(tx);
         if (to == null) {
             return;
         }
@@ -434,13 +434,15 @@ public class TransactionService extends BaseService {
             Map<String, String> map = (Map<String, String>) redisTemplate.opsForList().rightPop(CommonConstants.TOKEN_SELL_TRANS_LIST);
             if (null != map) {
                 String orderId = map.get("orderId");
-                String signature = map.get("signature");
-                EthSendTransaction result = web3j.ethSendRawTransaction(signature).send();
-                String tempOrderId = orderId.replaceAll("TOKEN_SELL_T_", "");
-                if (result.hasError()) {
-                    transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
-                } else {
-                    transactionMapper.updateHashByOrderId(tempOrderId, result.getTransactionHash());
+                if (orderId.startsWith("T")) {
+                    String signature = map.get("signature");
+                    EthSendTransaction result = web3j.ethSendRawTransaction(signature).send();
+                    String tempOrderId = orderId.replaceAll("TOKEN_SELL_T_", "");
+                    if (result.hasError()) {
+                        transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
+                    } else {
+                        transactionMapper.updateHashByOrderId(tempOrderId, result.getTransactionHash());
+                    }
                 }
             }
             Thread.sleep(1);
