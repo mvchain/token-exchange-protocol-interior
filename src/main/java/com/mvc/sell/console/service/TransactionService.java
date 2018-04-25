@@ -470,6 +470,7 @@ public class TransactionService extends BaseService {
                         transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
                     } else {
                         transactionMapper.updateHashByOrderId(tempOrderId, result.getTransactionHash());
+                        redisTemplate.opsForValue().set(RedisConstants.LISTEN_HASH + "#" + result.getTransactionHash(), 1);
                     }
                 }
             }
