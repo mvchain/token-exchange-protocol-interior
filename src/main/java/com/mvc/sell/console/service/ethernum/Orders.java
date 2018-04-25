@@ -32,7 +32,7 @@ public class Orders {
         if (anObject instanceof Orders) {
             Orders obj = (Orders) anObject;
             String ob = obj.orderId.startsWith("TOKEN_SELL_T_C") && "ETH".equalsIgnoreCase(obj.tokenType) ? "TOKEN_SELL_T_C" : obj.orderId;
-            return o.equals(ob);
+            return (o + fromAddress).equals(obj.fromAddress + ob);
         }
         return super.equals(anObject);
     }
@@ -40,7 +40,7 @@ public class Orders {
     @Override
     public int hashCode() {
         String o = orderId.startsWith("TOKEN_SELL_T_C") && "ETH".equalsIgnoreCase(tokenType) ? "TOKEN_SELL_T_C" : orderId;
-        return o.hashCode();
+        return (fromAddress + o).hashCode();
     }
 
 }
