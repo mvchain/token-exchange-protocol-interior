@@ -462,6 +462,7 @@ public class TransactionService extends BaseService {
                 String tempOrderId = orderId.replaceAll("TOKEN_SELL_T_", "");
                 if (tempOrderId.startsWith("T")) {
                     if (result.hasError()) {
+                        log.error(result.getError());
                         transactionMapper.updateStatusByOrderId(tempOrderId, CommonConstants.ERROR);
                     } else {
                         transactionMapper.updateHashByOrderId(tempOrderId, result.getTransactionHash());
