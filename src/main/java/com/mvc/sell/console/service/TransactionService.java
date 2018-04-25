@@ -400,13 +400,17 @@ public class TransactionService extends BaseService {
         }
         for (Transaction transaction : transactionsTemp) {
             com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
-            result.add(orders);
+            if (orders.getValue().compareTo(BigDecimal.ZERO) > 0) {
+                result.add(orders);
+            }
         }
         while (redisTemplate.opsForList().size(key) > 0) {
             Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(key);
             redisTemplate.opsForList().leftPush(tempKey, transaction);
             com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
-            result.add(orders);
+            if (orders.getValue().compareTo(BigDecimal.ZERO) > 0) {
+                result.add(orders);
+            }
         }
         Collections.reverse(result);
         Map<String, Integer> nonceCount = new HashMap<>(result.size());
