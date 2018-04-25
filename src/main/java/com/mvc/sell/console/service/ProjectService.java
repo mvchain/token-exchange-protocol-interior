@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * project service
@@ -220,6 +221,7 @@ public class ProjectService extends BaseService {
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
         use = use == null ? withdrawDTO.getNumber() : use.add(withdrawDTO.getNumber());
         redisTemplate.opsForValue().set(key, use);
+        redisTemplate.expire(key, 24, TimeUnit.HOURS);
     }
 
     private void checkCanWithdraw(WithdrawDTO withdrawDTO, Config config) {
