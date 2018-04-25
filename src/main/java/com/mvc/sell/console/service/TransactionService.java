@@ -11,6 +11,7 @@ import com.mvc.sell.console.pojo.bean.Transaction;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import com.mvc.sell.console.service.ethernum.ContractService;
+import com.mvc.sell.console.service.ethernum.Orders;
 import com.mvc.sell.console.util.BeanUtil;
 import com.mvc.sell.console.util.Web3jUtil;
 import lombok.extern.log4j.Log4j;
@@ -26,6 +27,7 @@ import org.web3j.protocol.admin.methods.response.PersonalUnlockAccount;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.Contract;
 import rx.Subscription;
@@ -35,6 +37,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -406,6 +409,14 @@ public class TransactionService extends BaseService {
             result.add(orders);
         }
         Collections.reverse(result);
+        Map<String, Integer> nonceCount = new HashMap<>(result.size());
+        for (int i = 0; i < result.size(); i++) {
+            Orders orders = result.get(i);
+            Integer nonceBase = nonceCount.get(orders.getFromAddress());
+            nonceBase = null == nonceBase ? 0 : nonceBase;
+            orders.setNonce(getNonce(orders.getFromAddress()).add(BigInteger.valueOf(nonceBase)));
+            nonceCount.put(orders.getFromAddress(), nonceBase + 1);
+        }
         return result.stream().distinct().collect(Collectors.toList());
     }
 
@@ -427,6 +438,18 @@ public class TransactionService extends BaseService {
 
     public void importTransaction(List<Map> list) {
         redisTemplate.opsForList().rightPushAll(CommonConstants.TOKEN_SELL_TRANS_LIST, list);
+    }
+
+    BigInteger getNonce(String address) {
+        EthGetTransactionCount ethGetTransactionCount = null;
+        try {
+            ethGetTransactionCount = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST).sendAsync().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return ethGetTransactionCount.getTransactionCount();
     }
 
     public void startTransaction() {

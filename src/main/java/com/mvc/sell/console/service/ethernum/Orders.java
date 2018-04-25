@@ -24,6 +24,7 @@ public class Orders {
     private Date updatedAt;
     private BigInteger missionId;
     private String signature;
+    private BigInteger nonce;
 
     @Override
     public boolean equals(Object anObject) {
