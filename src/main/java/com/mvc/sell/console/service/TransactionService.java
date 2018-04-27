@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -421,7 +422,9 @@ public class TransactionService extends BaseService {
             orders.setNonce(getNonce(orders.getFromAddress()).add(BigInteger.valueOf(nonceBase)));
             nonceCount.put(orders.getFromAddress(), nonceBase + 1);
         }
-        return result.stream().distinct().collect(Collectors.toList());
+        Function<Orders, BigInteger> comparator = Orders::getNonce;
+        Comparator<Orders> byNonce = Comparator.comparing(comparator);
+        return result.stream().distinct().sorted(byNonce).collect(Collectors.toList());
     }
 
     private com.mvc.sell.console.service.ethernum.Orders getOrders(Transaction transaction) {
