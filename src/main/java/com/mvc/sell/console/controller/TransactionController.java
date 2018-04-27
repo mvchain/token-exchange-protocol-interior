@@ -49,6 +49,7 @@ public class TransactionController extends BaseController {
 
     @ApiOperation("导入账户")
     @PostMapping(value = "import/account")
+    @NeedLogin
     public Result<Long> importAccount(@RequestBody MultipartFile file) throws Exception {
         String jsonStr = IOUtils.toString(file.getInputStream());
         List<Map> list = JSON.parseArray(jsonStr, Map.class);
@@ -58,6 +59,7 @@ public class TransactionController extends BaseController {
 
     @ApiOperation("获取剩余账户数量, 过少则需要新增导入")
     @GetMapping(value = "account/size")
+    @NeedLogin
     public Result<Long> getAccountSize() throws Exception {
         Long size = transactionService.getAccountSize();
         return ResultGenerator.genSuccessResult(size);
@@ -65,6 +67,7 @@ public class TransactionController extends BaseController {
 
     @ApiOperation("下载待处理数据")
     @GetMapping("transaction/json")
+    @NeedLogin
     void getTransactionJson(HttpServletResponse response) throws IOException {
         List<com.mvc.sell.console.service.ethernum.Orders> accountList = transactionService.getTransactionJson();
         response.setContentType("text/plain");
@@ -79,6 +82,7 @@ public class TransactionController extends BaseController {
 
     @ApiOperation("导入待处理交易")
     @PostMapping(value = "import/transaction")
+    @NeedLogin
     public Result<Long> importTransaction(@RequestBody MultipartFile file) throws Exception {
         String jsonStr = IOUtils.toString(file.getInputStream());
         List<Map> list = JSON.parseArray(jsonStr, Map.class);
