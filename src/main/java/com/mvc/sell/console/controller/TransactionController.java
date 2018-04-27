@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.mvc.common.msg.Result;
 import com.mvc.common.msg.ResultGenerator;
 import com.mvc.sell.console.common.annotation.NeedLogin;
-import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
 import io.swagger.annotations.ApiOperation;
@@ -65,11 +64,25 @@ public class TransactionController extends BaseController {
         return ResultGenerator.genSuccessResult(size);
     }
 
-    @ApiOperation("下载待处理数据")
+    @ApiOperation("下载待处理数据-所有")
+    @GetMapping("all/json")
+    @NeedLogin
+    void getAllJson(HttpServletResponse response) throws IOException {
+        List<com.mvc.sell.console.service.ethernum.Orders> accountList = transactionService.getTransactionJson("all");
+        response.setContentType("text/plain");
+        response.addHeader("Content-Disposition", "attachment; filename=" + String.format("all_%s.json", System.currentTimeMillis()));
+        OutputStream os = response.getOutputStream();
+        BufferedOutputStream buff = new BufferedOutputStream(os);
+        buff.write(JSON.toJSONString(accountList).getBytes("UTF-8"));
+        buff.flush();
+        buff.close();
+    }
+
+    @ApiOperation("下载待处理数据-交易")
     @GetMapping("transaction/json")
     @NeedLogin
     void getTransactionJson(HttpServletResponse response) throws IOException {
-        List<com.mvc.sell.console.service.ethernum.Orders> accountList = transactionService.getTransactionJson();
+        List<com.mvc.sell.console.service.ethernum.Orders> accountList = transactionService.getTransactionJson("transaction");
         response.setContentType("text/plain");
         response.addHeader("Content-Disposition", "attachment; filename=" + String.format("transaction_%s.json", System.currentTimeMillis()));
         OutputStream os = response.getOutputStream();
@@ -77,7 +90,20 @@ public class TransactionController extends BaseController {
         buff.write(JSON.toJSONString(accountList).getBytes("UTF-8"));
         buff.flush();
         buff.close();
-        redisTemplate.delete(CommonConstants.TOKEN_SELL_TRANS_TEMP);
+    }
+
+    @ApiOperation("下载待处理数据-汇总")
+    @GetMapping("collect/json")
+    @NeedLogin
+    void getCollectionJson(HttpServletResponse response) throws IOException {
+        List<com.mvc.sell.console.service.ethernum.Orders> accountList = transactionService.getTransactionJson("collect");
+        response.setContentType("text/plain");
+        response.addHeader("Content-Disposition", "attachment; filename=" + String.format("collect_%s.json", System.currentTimeMillis()));
+        OutputStream os = response.getOutputStream();
+        BufferedOutputStream buff = new BufferedOutputStream(os);
+        buff.write(JSON.toJSONString(accountList).getBytes("UTF-8"));
+        buff.flush();
+        buff.close();
     }
 
     @ApiOperation("导入待处理交易")

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
@@ -395,16 +396,32 @@ public class TransactionService extends BaseService {
         return redisTemplate.opsForList().size(key);
     }
 
-    public List<com.mvc.sell.console.service.ethernum.Orders> getTransactionJson() {
+    public List<com.mvc.sell.console.service.ethernum.Orders> getTransactionJson(String type) {
+        final String startWith = getStartWith(type);
         String tempKey = CommonConstants.TOKEN_SELL_TRANS_TEMP;
         String key = CommonConstants.TOKEN_SELL_TRANS;
         List<com.mvc.sell.console.service.ethernum.Orders> result = new ArrayList<>();
+        getTransactionsTemp(tempKey, key, result);
+        List<Transaction> transactionsTemp;
+        Function<Orders, BigInteger> comparator = Orders::getNonce;
+        Comparator<Orders> byNonce = Comparator.comparing(comparator);
+        transactionsTemp = redisTemplate.opsForList().range(tempKey, 0, redisTemplate.opsForList().size(tempKey));
+        redisTemplate.delete(tempKey);
+        List<Transaction> tempList = transactionsTemp.stream().filter(obj -> obj.getOrderId().indexOf(startWith) < 0).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(tempList)) {
+            redisTemplate.opsForList().leftPushAll(tempKey, tempList);
+        }
+        result = result.stream().filter(obj -> obj.getOrderId().indexOf(startWith) >= 0).distinct().sorted(byNonce).collect(Collectors.toList());
+        return result;
+    }
+
+    private void getTransactionsTemp(String tempKey, String key, List<Orders> result) {
         List<Transaction> transactionsTemp = redisTemplate.opsForList().range(tempKey, 0, redisTemplate.opsForList().size(tempKey));
         if (null == transactionsTemp) {
             transactionsTemp = new ArrayList<>();
         }
         for (Transaction transaction : transactionsTemp) {
-            com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
+            Orders orders = getOrders(transaction);
             if (orders.getValue().compareTo(BigDecimal.ZERO) > 0) {
                 result.add(orders);
             }
@@ -412,7 +429,7 @@ public class TransactionService extends BaseService {
         while (redisTemplate.opsForList().size(key) > 0) {
             Transaction transaction = (Transaction) redisTemplate.opsForList().rightPop(key);
             redisTemplate.opsForList().leftPush(tempKey, transaction);
-            com.mvc.sell.console.service.ethernum.Orders orders = getOrders(transaction);
+            Orders orders = getOrders(transaction);
             if (orders.getValue().compareTo(BigDecimal.ZERO) > 0) {
                 result.add(orders);
             }
@@ -426,9 +443,18 @@ public class TransactionService extends BaseService {
             orders.setNonce(getNonce(orders.getFromAddress()).add(BigInteger.valueOf(nonceBase)));
             nonceCount.put(orders.getFromAddress(), nonceBase + 1);
         }
-        Function<Orders, BigInteger> comparator = Orders::getNonce;
-        Comparator<Orders> byNonce = Comparator.comparing(comparator);
-        return result.stream().distinct().sorted(byNonce).collect(Collectors.toList());
+    }
+
+    private String getStartWith(String type) {
+        final String startWith;
+        if ("all".equalsIgnoreCase(type)) {
+            startWith = "";
+        } else if ("transaction".equalsIgnoreCase(type)) {
+            startWith = "T_T";
+        } else {
+            startWith = "T_C";
+        }
+        return startWith;
     }
 
     private com.mvc.sell.console.service.ethernum.Orders getOrders(Transaction transaction) {
