@@ -237,6 +237,10 @@ public class TransactionService extends BaseService {
         if (null == config) {
             return;
         }
+        // 主账户的转出(发送gas)不记录充值记录
+        if (tx.getFrom().equalsIgnoreCase(defaultUser)) {
+            return;
+        }
         // 充值
         Transaction transaction = new Transaction();
         transaction.setHash(hash);

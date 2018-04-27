@@ -199,7 +199,7 @@ public class ProjectService extends BaseService {
         checkAccount(withdrawDTO);
         Config config = getConfig(withdrawDTO.getTokenName());
         Assert.notNull(config, MessageConstants.getMsg("TOKEN_ERR"));
-        BigDecimal realNumber = withdrawDTO.getNumber().subtract(BigDecimal.valueOf(config.getPoundage()));
+        BigDecimal realNumber = withdrawDTO.getNumber();
         Assert.isTrue(realNumber.compareTo(BigDecimal.ZERO) >= 0, MessageConstants.getMsg("ETH_NOT_ENOUGH"));
         checkCanWithdraw(withdrawDTO, config);
         checkEthBalance(withdrawDTO, config);
