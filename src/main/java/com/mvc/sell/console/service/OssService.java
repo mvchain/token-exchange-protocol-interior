@@ -34,7 +34,7 @@ public class OssService {
     private String bucketName;
 
     public Map<String, String> doGetSignature(String dir) throws UnsupportedEncodingException {
-        String host = "http://" + bucketName + "." + endpoint;
+        String host = "https://" + bucketName + "." + endpoint;
         long expireTime = 300;
         long expireEndTime = System.currentTimeMillis() + expireTime * 1000;
         Date expiration = new Date(expireEndTime);
