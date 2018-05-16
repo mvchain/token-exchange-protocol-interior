@@ -153,7 +153,7 @@ public class TransactionService extends BaseService {
             // listen new transaction
             newListen();
         } catch (Exception e) {
-            Thread.sleep(10000);
+            Thread.sleep(3000);
             startListen();
         }
     }
@@ -170,7 +170,7 @@ public class TransactionService extends BaseService {
         }
         while (true) {
             if (null == subscribe || subscribe.isUnsubscribed()) {
-                Thread.sleep(10000);
+                Thread.sleep(3000);
                 newListen();
             }
         }
@@ -345,7 +345,7 @@ public class TransactionService extends BaseService {
         );
         while (true) {
             if (null == subscription || subscription.isUnsubscribed()) {
-                Thread.sleep(10000);
+                Thread.sleep(3000);
                 historyListen();
             }
         }
@@ -375,7 +375,7 @@ public class TransactionService extends BaseService {
             // listen history transaction
             historyListen();
         } catch (Exception e) {
-            Thread.sleep(10000);
+            Thread.sleep(3000);
             startHistory();
         }
     }
