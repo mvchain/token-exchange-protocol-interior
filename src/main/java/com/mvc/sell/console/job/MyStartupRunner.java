@@ -25,7 +25,7 @@ public class MyStartupRunner implements CommandLineRunner {
     public void run(String... args) throws InterruptedException {
         transactionService.initConfig();
         transactionService.startHistory();
-        transactionService.startListen();
+//        transactionService.startListen();
         while (true) {
             transactionService.startTransaction();
             Thread.sleep(1);

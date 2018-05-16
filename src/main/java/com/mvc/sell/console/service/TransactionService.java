@@ -1,5 +1,6 @@
 package com.mvc.sell.console.service;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.MessageConstants;
@@ -224,7 +225,7 @@ public class TransactionService extends BaseService {
         if (to == null) {
             return;
         }
-        String key = RedisConstants.LISTEN_ETH_ADDR + "#" + to;
+        String key = RedisConstants.LISTEN_ETH_ADDR + "#" + to.toLowerCase();
         String hash = tx.getHash();
         BigInteger userId = (BigInteger) redisTemplate.opsForValue().get(key);
         if (null == userId) {
@@ -415,6 +416,16 @@ public class TransactionService extends BaseService {
         return result;
     }
 
+    public static void main(String[] args) {
+        String str = "[{\"fromAddress\":\"0x3c1a52e2229feedddee0b7eadeccfa7cd2ae21b9\",\"nonce\":3,\"orderId\":\"TOKEN_SELL_T_C000000012\",\"toAddress\":\"0x648662ac074c16f5a807c7c9a979cb2786576cae\",\"tokenType\":\"ETH\",\"value\":0.281997},{\"fromAddress\":\"0x3c1a52e2229feedddee0b7eadeccfa7cd2ae21b9\",\"nonce\":4,\"orderId\":\"TOKEN_SELL_T_C000000011\",\"toAddress\":\"0x648662ac074c16f5a807c7c9a979cb2786576cae\",\"tokenType\":\"ETH\",\"value\":0.281897},{\"fromAddress\":\"0x3c1a52e2229feedddee0b7eadeccfa7cd2ae21b9\",\"nonce\":5,\"orderId\":\"TOKEN_SELL_T_C000000010\",\"toAddress\":\"0x648662ac074c16f5a807c7c9a979cb2786576cae\",\"tokenType\":\"ETH\",\"value\":0.281797}]";
+
+        List<com.mvc.sell.console.service.ethernum.Orders> result = new ArrayList<>();
+        result = JSON.parseArray(str, Orders.class);
+        Function<Orders, BigInteger> comparator = Orders::getNonce;
+        Comparator<Orders> byNonce = Comparator.comparing(comparator);
+        result = result.stream().filter(obj -> obj.getOrderId().indexOf("T_C") >= 0).distinct().sorted(byNonce).collect(Collectors.toList());
+        System.out.println(result);
+    }
     private void getTransactionsTemp(String tempKey, String key, List<Orders> result) {
         List<Transaction> transactionsTemp = redisTemplate.opsForList().range(tempKey, 0, redisTemplate.opsForList().size(tempKey));
         if (null == transactionsTemp) {
