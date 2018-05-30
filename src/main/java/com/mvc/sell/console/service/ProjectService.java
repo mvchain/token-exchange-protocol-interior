@@ -19,6 +19,8 @@ import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +48,8 @@ public class ProjectService extends BaseService {
     String defaultUser;
     @Value("${wallet.coldUser}")
     String coldUser;
+    @Value("${wallet.xlm.user}")
+    String xlmUser;
 
     public PageInfo<ProjectVO> list() {
         List<Project> list = projectMapper.selectAll();
@@ -188,7 +192,7 @@ public class ProjectService extends BaseService {
         capital.setTokenId(config.getId());
         capital = capitalMapper.selectOne(capital);
         withdrawInfoVO.setBalance(null == capital ? BigDecimal.ZERO : capital.getBalance());
-        String key = RedisConstants.TODAY_USER + "#" + tokenName + "#" + getUserId();
+        String key = RedisConstants.TODAY_USER + "#" + tokenName + "#" + getUserId() + "#" + new SimpleDateFormat("YYYYMMdd").format(new Date());
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
         withdrawInfoVO.setTodayUse(null == use ? BigDecimal.ZERO : use);
         return withdrawInfoVO;
@@ -214,10 +218,14 @@ public class ProjectService extends BaseService {
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
         transaction.setTokenId(config.getId());
-        transaction.setFromAddress(coldUser);
+        String fromUser = coldUser;
+        if(config.getContractAddress().equalsIgnoreCase("XLM") ||config.getContractAddress().startsWith("XLM-") ) {
+            fromUser = xlmUser;
+        }
+        transaction.setFromAddress(fromUser);
         transactionMapper.insert(transaction);
         capitalMapper.updateBalance(getUserId(), config.getId(), BigDecimal.ZERO.subtract(withdrawDTO.getNumber()));
-        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
+        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId() + "#" + new SimpleDateFormat("YYYYMMdd").format(new Date());
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
         use = use == null ? withdrawDTO.getNumber() : use.add(withdrawDTO.getNumber());
         redisTemplate.opsForValue().set(key, use);
@@ -228,7 +236,7 @@ public class ProjectService extends BaseService {
         String addressKey = RedisConstants.LISTEN_ETH_ADDR + "#" + withdrawDTO.getAddress();
         // 不能提现到临时地址
         Assert.isTrue(!redisTemplate.hasKey(addressKey), MessageConstants.getMsg("ADDRESS_ERROR"));
-        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId();
+        String key = RedisConstants.TODAY_USER + "#" + withdrawDTO.getTokenName() + "#" + getUserId() + "#" + new SimpleDateFormat("YYYYMMdd").format(new Date());
         BigDecimal use = (BigDecimal) redisTemplate.opsForValue().get(key);
         use = null == use ? BigDecimal.ZERO : use;
         Boolean canWithdraw = BigDecimal.valueOf(config.getMax()).subtract(use).compareTo(withdrawDTO.getNumber()) >= 0;

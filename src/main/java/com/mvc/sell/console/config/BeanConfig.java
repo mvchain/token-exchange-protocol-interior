@@ -8,6 +8,8 @@ import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.stellar.sdk.Network;
+import org.stellar.sdk.Server;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.admin.Admin;
 import org.web3j.protocol.http.HttpService;
@@ -27,6 +29,8 @@ public class BeanConfig {
 
     @Value("${service.geth}")
     public String WALLET_SERVICE;
+    @Value("${service.xlm}")
+    public String xlm;
 
     @Bean
     public OkHttpClient okHttpClient() throws IOException {
@@ -74,5 +78,17 @@ public class BeanConfig {
     @Bean
     public Web3j web3j(OkHttpClient okHttpClient) {
         return Web3j.build(new HttpService(WALLET_SERVICE, okHttpClient, false));
+    }
+
+    @Bean
+    public Server server() {
+        if (xlm.indexOf("test") > 0) {
+            Network.useTestNetwork();
+        } else {
+            Network.usePublicNetwork();
+        }
+        Server server = new Server(xlm);
+        server.setHttpClient(new OkHttpClient.Builder().build());
+        return server;
     }
 }

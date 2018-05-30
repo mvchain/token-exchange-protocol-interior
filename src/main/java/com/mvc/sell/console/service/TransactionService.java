@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -50,6 +52,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Log4j
+@Transactional(rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRED)
 public class TransactionService extends BaseService {
 
     @Autowired
@@ -72,6 +75,8 @@ public class TransactionService extends BaseService {
     BigDecimal ethLimit;
     @Autowired
     ContractService contractService;
+    @Autowired
+    XlmService xlmService;
 
     public final static BigInteger DEFAULT_GAS_PRICE = Contract.GAS_PRICE.divide(BigInteger.valueOf(5));
     public final static BigInteger DEFAULT_GAS_LIMIT = Contract.GAS_LIMIT.divide(BigInteger.valueOf(10));
@@ -98,7 +103,7 @@ public class TransactionService extends BaseService {
     }
 
     private void setBalance(BigInteger id, Integer status) {
-        if (status.equals(9)) {
+        if (status.equals(4)) {
             Transaction transaction = new Transaction();
             transaction.setId(id);
             transaction = transactionMapper.selectByPrimaryKey(transaction);
@@ -111,8 +116,13 @@ public class TransactionService extends BaseService {
             Transaction transaction = new Transaction();
             transaction.setId(id);
             transaction = transactionMapper.selectByPrimaryKey(transaction);
-            transaction.setNumber(transaction.getRealNumber());
-            redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
+            String config = getContractAddressByTokenId(transaction);
+            if (config.equalsIgnoreCase("XLM") || config.startsWith("XLM-")) {
+                xlmService.sendTransaction(transaction, config);
+            } else {
+                transaction.setNumber(transaction.getRealNumber());
+                redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
+            }
         }
     }
 
@@ -514,6 +524,20 @@ public class TransactionService extends BaseService {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void updateStatusByHash(String transactionHash) {
+        Transaction transaction = new Transaction();
+        transaction.setHash(transactionHash);
+        transaction = transactionMapper.selectOne(transaction);
+        if (null != transaction) {
+            transaction.setStatus(CommonConstants.STATUS_SUCCESS);
+            transactionMapper.updateByPrimaryKey(transaction);
+            System.out.println(new String[]{}[6]);
+            String key = RedisConstants.LISTEN_HASH + "#" + transactionHash;
+            redisTemplate.delete(key);
         }
     }
 }

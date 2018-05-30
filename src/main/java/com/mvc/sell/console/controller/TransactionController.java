@@ -38,7 +38,7 @@ public class TransactionController extends BaseController {
         return ResultGenerator.genSuccessResult(transactionService.transaction(transactionDTO));
     }
 
-    @ApiOperation("更新冲提状态 0待审核, 1等待提币(同意,同意后会直接发送,成功后刷新列表可看到hash), 2成功, 9拒绝")
+    @ApiOperation("更新冲提状态 0待审核, 1等待提币(同意,同意后会直接发送,成功后刷新列表可看到hash), 2成功, 4拒绝, 9失败")
     @PutMapping("{id}/status/{status}")
     @NeedLogin
     Result approval(@PathVariable BigInteger id, @PathVariable Integer status) throws Exception {

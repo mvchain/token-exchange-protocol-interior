@@ -33,6 +33,11 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>stellar</groupId>
+            <artifactId>java-stellar-sdk</artifactId>
+            <version>0.3.3</version>
+        </dependency>
         <!--增加eureka-server的依赖-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -182,6 +187,7 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 
@@ -226,4 +232,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
