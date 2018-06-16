@@ -7,6 +7,7 @@ import com.neemre.btcdcli4j.core.client.BtcdClientImpl;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.*;
 import java.util.Properties;
@@ -26,9 +27,9 @@ public final class ResourceUtils {
     }
 
     public static Properties getNodeConfig() throws IOException {
-        File file = org.springframework.util.ResourceUtils.getFile("classpath:node_config.properties");
+        ClassPathResource resource = new ClassPathResource("node_config.properties");
+        InputStream inputStream = resource.getInputStream();
         Properties nodeConfig = new Properties();
-        InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
         nodeConfig.load(inputStream);
         inputStream.close();
         return nodeConfig;
