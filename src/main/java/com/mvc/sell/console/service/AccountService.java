@@ -47,9 +47,9 @@ public class AccountService extends BaseService {
             address = addressMapper.selectOne(address);
             if (null == address) {
                 address = godService.newAddress(tokenName, account.getId());
-                if (null != address) {
-                    account.setAddressEth(address.getAddress());
-                }
+            }
+            if (null != address) {
+                account.setAddressEth(address.getAddress());
             }
         }
         return (AccountVO) BeanUtil.copyProperties(account, new AccountVO());
