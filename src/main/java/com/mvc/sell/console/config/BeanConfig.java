@@ -1,11 +1,11 @@
 package com.mvc.sell.console.config;
 
 import com.mvc.sell.console.service.TransactionService;
+import com.mvc.sell.console.util.ResourceUtils;
 import com.neemre.btcdcli4j.core.BitcoindException;
 import com.neemre.btcdcli4j.core.CommunicationException;
 import com.neemre.btcdcli4j.core.client.BtcdClient;
 import com.neemre.btcdcli4j.examples.client.VerboseBtcdClientImpl;
-import com.neemre.btcdcli4j.examples.util.ResourceUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
