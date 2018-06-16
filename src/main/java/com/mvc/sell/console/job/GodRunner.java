@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.stream.Collectors;
 
@@ -60,9 +61,9 @@ public class GodRunner implements CommandLineRunner {
     }
 
     private void start() throws BitcoindException, IOException, CommunicationException, InterruptedException {
-        String key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_BTC);
+        String key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
         if(null == key){
-            key = "36c1b15ac8a0bb17298756baee8655cfc005484fe668345cf893eee86e2942a2";
+            redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, "36c1b15ac8a0bb17298756baee8655cfc005484fe668345cf893eee86e2942a2");
         }
         while (true) {
             BigInteger tokenId = getTokenId();
@@ -70,11 +71,14 @@ public class GodRunner implements CommandLineRunner {
                 continue;
             }
             Thread.sleep(10);
-            key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_BTC);
+            key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
             Block block = btcdClient.getBlock(key);
             for (String txId : block.getTx()) {
                 Transaction tx = null;
                 try {
+                    if("6466624669d139c3ca210576c9f8b09703e5b3dcb94b2d6d758e7fe5a31d4f83".equalsIgnoreCase(txId)){
+                        System.out.println(111);
+                    }
                     tx = btcdClient.getTransaction(txId);
                     com.mvc.sell.console.pojo.bean.Transaction transaction = getTransaction(tx);
                     transactionService.insertOrUpdate(transaction);
@@ -85,25 +89,26 @@ public class GodRunner implements CommandLineRunner {
                 }
             }
             if (null != block.getNextBlockHash()) {
-                redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_BTC, block.getNextBlockHash());
+                redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, block.getNextBlockHash());
             }
         }
     }
 
     private com.mvc.sell.console.pojo.bean.Transaction getTransaction(Transaction tx) throws BitcoindException, CommunicationException {
         com.mvc.sell.console.pojo.bean.Transaction transaction = new com.mvc.sell.console.pojo.bean.Transaction();
+        BigDecimal value = tx.getAmount().abs();
         String hex = btcdClient.getRawTransaction(tx.getTxId());
-        String address = btcdClient.decodeRawTransaction(hex).getVOut().stream().filter(obj -> obj.getValue().compareTo(tx.getAmount()) == 0).collect(Collectors.toList()).get(0).getScriptPubKey().getAddresses().get(0);
+        String address = btcdClient.decodeRawTransaction(hex).getVOut().stream().filter(obj -> obj.getValue().compareTo(value) == 0).collect(Collectors.toList()).get(0).getScriptPubKey().getAddresses().get(0);
         transaction.setStatus(CommonConstants.STATUS_SUCCESS);
         transaction.setHash(tx.getTxId());
-        transaction.setRealNumber(tx.getAmount());
-        transaction.setNumber(tx.getAmount());
+        transaction.setRealNumber(value);
+        transaction.setNumber(value);
         transaction.setOrderId(configService.getOrderId(CommonConstants.ORDER_RECHARGE));
         transaction.setFromAddress("");
         transaction.setToAddress(address);
         transaction.setTokenId(getTokenId());
         transaction.setType(CommonConstants.RECHARGE);
-        transaction.setUserId(getUserId(tx.getTo()));
+        transaction.setUserId(getUserId(address));
         transaction.setPoundage(0f);
         return transaction;
     }

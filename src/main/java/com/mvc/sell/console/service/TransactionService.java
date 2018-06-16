@@ -549,13 +549,16 @@ public class TransactionService extends BaseService {
     }
 
     public void insertOrUpdate(Transaction transaction) {
-        if (null == transaction || null == transaction.getUserId()) {
+        if (null == transaction) {
             return;
         }
         Transaction temp = new Transaction();
         temp.setHash(transaction.getHash());
         temp = transactionMapper.selectOne(temp);
         if (null == temp) {
+            if (null == transaction.getUserId()) {
+                return;
+            }
             transactionMapper.insertSelective(transaction);
             updateBalance(transaction);
         } else {
