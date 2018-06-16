@@ -122,8 +122,11 @@ public class TransactionService extends BaseService {
             String config = getContractAddressByTokenId(transaction);
             if (config.equalsIgnoreCase("XLM") || config.startsWith("XLM-")) {
                 xlmService.sendTransaction(transaction, config);
-            } else if("god".equalsIgnoreCase(config)){
-                godService.sendTransaction(transaction, config);
+            } else if ("god".equalsIgnoreCase(config)) {
+                String hash = godService.sendTransaction(transaction, config);
+                transaction.setStatus(CommonConstants.WITHDRAW);
+                transaction.setHash(hash);
+                transactionMapper.updateByPrimaryKeySelective(transaction);
             } else {
                 transaction.setNumber(transaction.getRealNumber());
                 redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
@@ -540,12 +543,24 @@ public class TransactionService extends BaseService {
         if (null != transaction) {
             transaction.setStatus(CommonConstants.STATUS_SUCCESS);
             transactionMapper.updateByPrimaryKey(transaction);
-            System.out.println(new String[]{}[6]);
             String key = RedisConstants.LISTEN_HASH + "#" + transactionHash;
             redisTemplate.delete(key);
         }
     }
 
     public void insertOrUpdate(Transaction transaction) {
+        if (null == transaction || null == transaction.getUserId()) {
+            return;
+        }
+        Transaction temp = new Transaction();
+        temp.setHash(transaction.getHash());
+        temp = transactionMapper.selectOne(temp);
+        if (null == temp) {
+            transactionMapper.insertSelective(transaction);
+            updateBalance(transaction);
+        } else {
+            temp.setStatus(CommonConstants.STATUS_SUCCESS);
+            transactionMapper.updateByPrimaryKeySelective(temp);
+        }
     }
 }

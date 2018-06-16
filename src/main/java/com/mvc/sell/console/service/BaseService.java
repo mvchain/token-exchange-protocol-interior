@@ -47,7 +47,7 @@ public class BaseService {
         return (BigInteger) BaseContextHandler.get("userId");
     }
 
-    String getOrderId(String type) {
+    public String getOrderId(String type) {
         Long sid = redisTemplate.opsForValue().increment(type, 1);
         return type + String.format("%09d", sid);
     }
