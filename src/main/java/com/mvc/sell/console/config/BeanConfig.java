@@ -1,10 +1,16 @@
 package com.mvc.sell.console.config;
 
 import com.mvc.sell.console.service.TransactionService;
+import com.neemre.btcdcli4j.core.BitcoindException;
+import com.neemre.btcdcli4j.core.CommunicationException;
+import com.neemre.btcdcli4j.core.client.BtcdClient;
+import com.neemre.btcdcli4j.examples.client.VerboseBtcdClientImpl;
+import com.neemre.btcdcli4j.examples.util.ResourceUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +22,8 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.quorum.Quorum;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -90,5 +98,14 @@ public class BeanConfig {
         Server server = new Server(xlm);
         server.setHttpClient(new OkHttpClient.Builder().build());
         return server;
+    }
+
+    @Bean
+    public BtcdClient btcdClient() throws IOException, BitcoindException, CommunicationException {
+        CloseableHttpClient httpProvider = ResourceUtils.getHttpProvider();
+        Properties nodeConfig = ResourceUtils.getNodeConfig();
+        BtcdClient client = new VerboseBtcdClientImpl(httpProvider, nodeConfig);
+        client.setTxFee(new BigDecimal(0.00010044));
+        return client;
     }
 }

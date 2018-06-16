@@ -2,11 +2,14 @@ package com.mvc.sell.console.service;
 
 import com.github.pagehelper.PageInfo;
 import com.mvc.sell.console.pojo.bean.Account;
+import com.mvc.sell.console.pojo.bean.Address;
 import com.mvc.sell.console.pojo.bean.Capital;
 import com.mvc.sell.console.pojo.dto.UserFindDTO;
 import com.mvc.sell.console.pojo.vo.AccountVO;
 import com.mvc.sell.console.pojo.vo.CapitalVO;
+import com.mvc.sell.console.service.btc.GodService;
 import com.mvc.sell.console.util.BeanUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -21,6 +24,8 @@ import java.util.List;
 @Service
 public class AccountService extends BaseService {
 
+    @Autowired
+    private GodService godService;
 
     public PageInfo<AccountVO> list(UserFindDTO userFindDTO) {
         Account account = new Account();
@@ -31,10 +36,22 @@ public class AccountService extends BaseService {
         return (PageInfo<AccountVO>) BeanUtil.beanList2VOList(pageInfo, AccountVO.class);
     }
 
-    public AccountVO get(BigInteger id) {
+    public AccountVO get(BigInteger id, String tokenName) {
         Account t = new Account();
         t.setId(id);
         Account account = accountMapper.selectByPrimaryKey(t);
+        if (null != tokenName && "god".equalsIgnoreCase(tokenName)) {
+            Address address = new Address();
+            address.setTokenType(tokenName.toUpperCase());
+            address.setUserId(account.getId());
+            address = addressMapper.selectOne(address);
+            if (null == address) {
+                address = godService.newAddress(tokenName, account.getId());
+                if (null != address) {
+                    account.setAddressEth(address.getAddress());
+                }
+            }
+        }
         return (AccountVO) BeanUtil.copyProperties(account, new AccountVO());
     }
 

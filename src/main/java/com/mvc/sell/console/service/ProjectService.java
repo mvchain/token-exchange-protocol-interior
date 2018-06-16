@@ -146,7 +146,7 @@ public class ProjectService extends BaseService {
         Capital ethCapital = new Capital();
         ethCapital.setUserId(getUserId());
         ethCapital.setTokenId(BigInteger.ZERO);
-        Integer result = capitalMapper.updateEth(getUserId(), buyDTO.getEthNumber());
+        Integer result = capitalMapper.updateEth(getUserId(), buyDTO.getEthNumber(), getTokenIdByNameIgnoreCase(project.getCoin()));
         Assert.isTrue(result > 0, MessageConstants.getMsg("ETH_NOT_ENOUGH"));
         // add order
         addOrder(buyDTO, balance);
@@ -219,7 +219,7 @@ public class ProjectService extends BaseService {
         transaction.setUserId(getUserId());
         transaction.setTokenId(config.getId());
         String fromUser = coldUser;
-        if(config.getContractAddress().equalsIgnoreCase("XLM") ||config.getContractAddress().startsWith("XLM-") ) {
+        if (config.getContractAddress().equalsIgnoreCase("XLM") || config.getContractAddress().startsWith("XLM-")) {
             fromUser = xlmUser;
         }
         transaction.setFromAddress(fromUser);
@@ -260,7 +260,7 @@ public class ProjectService extends BaseService {
     }
 
     private void checkAccount(WithdrawDTO withdrawDTO) {
-        AccountVO account = accountService.get(getUserId());
+        AccountVO account = accountService.get(getUserId(), null);
         Assert.isTrue(encoder.matches(withdrawDTO.getTransactionPassword(), account.getTransactionPassword()), MessageConstants.getMsg("TRANSFER_USER_PWD_ERR"));
     }
 
@@ -310,10 +310,21 @@ public class ProjectService extends BaseService {
         Orders orders = new Orders();
         orders.setProjectId(id);
         if (orderMapper.selectCount(orders) > 0) {
-            projectMapper.retireBalance(id);
+            BigInteger tokenId = getTokenIdByNameIgnoreCase(project.getCoin());
+            projectMapper.retireBalance(id, tokenId);
             projectMapper.retireToken(id, config.getId());
             orderService.retireToken(id, CommonConstants.ORDER_STATUS_RETIRE);
         }
+    }
+
+    public BigInteger getTokenIdByNameIgnoreCase(String tokenName) {
+        Config config = new Config();
+        config.setTokenName(tokenName);
+        config = configMapper.selectOne(config);
+        if (null != config) {
+            return config.getId();
+        }
+        return BigInteger.ZERO;
     }
 
     public List<Project> select(Project project) {

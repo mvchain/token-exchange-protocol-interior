@@ -44,4 +44,6 @@ public class Project {
     private Integer needShow;
     private Integer sendToken;
     private Integer retire;
+    private String coin;
+
 }

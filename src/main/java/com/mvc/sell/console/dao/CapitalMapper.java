@@ -24,6 +24,6 @@ public interface CapitalMapper extends Mapper<Capital> {
     @Update("update capital set balance = balance + #{balance} where user_id = #{userId} and token_id = #{tokenId}")
     void updateBalance(@Param("userId") BigInteger userId, @Param("tokenId") BigInteger tokenId, @Param("balance") BigDecimal balance);
 
-    @Update("update capital set balance = balance - #{ethNumber} where user_id = #{userId} and token_id = 0 and balance >= #{ethNumber}")
-    Integer updateEth(@Param("userId") BigInteger userId, @Param("ethNumber") BigDecimal ethNumber);
+    @Update("update capital set balance = balance - #{ethNumber} where user_id = #{userId} and token_id = #{tokenId} and balance >= #{ethNumber}")
+    Integer updateEth(@Param("userId") BigInteger userId, @Param("ethNumber") BigDecimal ethNumber, @Param("tokenId") BigInteger tokenId);
 }

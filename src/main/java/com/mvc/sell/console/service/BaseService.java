@@ -40,6 +40,8 @@ public class BaseService {
     ProjectSoldMapper tokenSoldMapper;
     @Autowired
     RedisTemplate redisTemplate;
+    @Autowired
+    AddressMapper addressMapper;
 
     BigInteger getUserId() {
         return (BigInteger) BaseContextHandler.get("userId");

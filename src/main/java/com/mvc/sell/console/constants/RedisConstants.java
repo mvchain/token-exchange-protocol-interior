@@ -15,4 +15,5 @@ public interface RedisConstants {
     String GAS_QUENE = "GAS_QUENE";
     String ORDER_LOCK = "ORDER_LOCK";
     String LAST_TOKEN_XLM = "LAST_TOKEN_XLM";
+    String LAST_TOKEN_BTC = "LAST_TOKEN_BTC";
 }

@@ -41,10 +41,10 @@ public class AccountController extends BaseController {
     }
 
     @ApiIgnore
-    @GetMapping("{id}")
+    @GetMapping("{id}/{tokenName}")
     @NeedLogin
-    Result<AccountVO> get(@PathVariable BigInteger id) {
-        return ResultGenerator.genSuccessResult(accountService.get(id));
+    Result<AccountVO> get(@PathVariable BigInteger id, @PathVariable String tokenName) {
+        return ResultGenerator.genSuccessResult(accountService.get(id, tokenName));
     }
 
     @ApiIgnore

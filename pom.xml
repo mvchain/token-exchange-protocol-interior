@@ -188,6 +188,16 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.neemre.btcd-cli4j</groupId>
+            <artifactId>btcd-cli4j-core</artifactId>
+            <version>0.5.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.neemre.btcd-cli4j</groupId>
+            <artifactId>btcd-cli4j-examples</artifactId>
+            <version>0.5.9</version>
+        </dependency>
     </dependencies>
 
 
