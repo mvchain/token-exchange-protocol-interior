@@ -52,7 +52,7 @@ public class GodService extends BaseService {
                 btcdClient.walletPassphrase(password, 5);
             }
             btcdClient.walletPassphrase(password, 100);
-            String result = btcdClient.sendFrom(transaction.getFromAddress(), transaction.getToAddress(), transaction.getRealNumber());
+            String result = btcdClient.sendToAddress(transaction.getToAddress(), transaction.getRealNumber());
             return result;
         } catch (Exception e1) {
             e = e1;
