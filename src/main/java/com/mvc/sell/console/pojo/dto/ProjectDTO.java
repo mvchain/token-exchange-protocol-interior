@@ -38,5 +38,6 @@ public class ProjectDTO implements Serializable {
     private String position;
     private String description;
     private Integer decimals;
+    private String coin;
 
 }
