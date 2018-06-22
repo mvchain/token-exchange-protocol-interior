@@ -18,7 +18,7 @@ import java.math.BigInteger;
  * @author qiyichen
  * @create 2018/6/15 17:12
  */
-@Service
+//@Service
 public class GodService extends BaseService {
 
     @Autowired

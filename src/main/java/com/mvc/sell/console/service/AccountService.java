@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 public class AccountService extends BaseService {
 
-    @Autowired
+//    @Autowired
     private GodService godService;
 
     public PageInfo<AccountVO> list(UserFindDTO userFindDTO) {

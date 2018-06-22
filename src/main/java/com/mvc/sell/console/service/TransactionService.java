@@ -78,7 +78,7 @@ public class TransactionService extends BaseService {
     ContractService contractService;
     @Autowired
     XlmService xlmService;
-    @Autowired
+//    @Autowired
     GodService godService;
 
     public final static BigInteger DEFAULT_GAS_PRICE = Contract.GAS_PRICE.divide(BigInteger.valueOf(5));
