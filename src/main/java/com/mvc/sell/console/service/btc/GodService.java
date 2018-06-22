@@ -7,18 +7,21 @@ import com.mvc.sell.console.service.BaseService;
 import com.neemre.btcdcli4j.core.BitcoindException;
 import com.neemre.btcdcli4j.core.CommunicationException;
 import com.neemre.btcdcli4j.core.client.BtcdClient;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
  * @author qiyichen
  * @create 2018/6/15 17:12
  */
-//@Service
+@Service
+@Log4j
 public class GodService extends BaseService {
 
     @Autowired
@@ -42,6 +45,15 @@ public class GodService extends BaseService {
             e.printStackTrace();
         }
         return address;
+    }
+
+    @Override
+    public BigDecimal getBalance() {
+        try {
+            return btcdClient.getBalance();
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
     }
 
     public String sendTransaction(Transaction transaction, String config) {

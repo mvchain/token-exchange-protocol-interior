@@ -10,10 +10,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.stellar.sdk.*;
+import org.stellar.sdk.responses.AccountResponse;
 import org.stellar.sdk.responses.SubmitTransactionResponse;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * XlmService
@@ -23,7 +30,8 @@ import java.io.IOException;
  */
 @Service
 @Log4j
-public class XlmService {
+@Transactional(rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRED)
+public class XlmService extends BaseService {
 
     @Autowired
     private Server server;
@@ -58,5 +66,18 @@ public class XlmService {
         transactionMapper.updateByPrimaryKeySelective(transaction);
         String key = RedisConstants.LISTEN_HASH + "#" + result.getHash();
         redisTemplate.opsForValue().set(key, 1);
+    }
+
+    @Override
+    public BigDecimal getBalance() {
+        try {
+            KeyPair fromPair = KeyPair.fromSecretSeed(pv);
+            AccountResponse.Balance[] result = server.accounts().account(fromPair).getBalances();
+            List<AccountResponse.Balance> list = Arrays.stream(result).filter(obj -> (null == obj.getAssetCode())).collect(Collectors.toList());
+            String balance = list.size() == 0 ? "0" : list.get(0).getBalance();
+            return new BigDecimal(balance);
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
     }
 }

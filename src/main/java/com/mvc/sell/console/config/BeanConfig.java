@@ -100,12 +100,11 @@ public class BeanConfig {
         return server;
     }
 
-//    @Bean
+    @Bean
     public BtcdClient btcdClient() throws IOException, BitcoindException, CommunicationException {
         CloseableHttpClient httpProvider = ResourceUtils.getHttpProvider();
         Properties nodeConfig = ResourceUtils.getNodeConfig();
         BtcdClient client = new VerboseBtcdClientImpl(httpProvider, nodeConfig);
-        client.setTxFee(new BigDecimal(0.00010044));
         return client;
     }
 }

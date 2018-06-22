@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -51,4 +52,9 @@ public class BaseService {
         Long sid = redisTemplate.opsForValue().increment(type, 1);
         return type + String.format("%09d", sid);
     }
+
+    public BigDecimal getBalance(){
+        return BigDecimal.ZERO;
+    };
+
 }

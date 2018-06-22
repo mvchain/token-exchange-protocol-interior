@@ -1,6 +1,7 @@
 package com.mvc.sell.console.service;
 
 import com.github.pagehelper.PageInfo;
+import com.mvc.common.context.BaseContextHandler;
 import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.MessageConstants;
 import com.mvc.sell.console.constants.RedisConstants;
@@ -14,6 +15,7 @@ import com.mvc.sell.console.service.btc.GodService;
 import com.mvc.sell.console.service.ethernum.ContractService;
 import com.mvc.sell.console.service.ethernum.Orders;
 import com.mvc.sell.console.util.BeanUtil;
+import com.mvc.sell.console.util.Convert;
 import com.mvc.sell.console.util.Web3jUtil;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +80,7 @@ public class TransactionService extends BaseService {
     ContractService contractService;
     @Autowired
     XlmService xlmService;
-//    @Autowired
+    @Autowired
     GodService godService;
 
     public final static BigInteger DEFAULT_GAS_PRICE = Contract.GAS_PRICE.divide(BigInteger.valueOf(5));
@@ -564,6 +566,23 @@ public class TransactionService extends BaseService {
         } else {
             temp.setStatus(CommonConstants.STATUS_SUCCESS);
             transactionMapper.updateByPrimaryKeySelective(temp);
+        }
+    }
+
+    @Override
+    public BigDecimal getBalance() {
+        try {
+            String tokenName = (String) BaseContextHandler.get("tokenName");
+            if ("ETH".equalsIgnoreCase(tokenName)) {
+                BigInteger balance = web3j.ethGetBalance(defaultUser, DefaultBlockParameterName.LATEST).send().getBalance();
+                return Convert.fromWei(new BigDecimal(balance), Convert.Unit.ETHER);
+            } else {
+                Config config = configService.getConfigByTokenName(tokenName);
+                BigInteger balance = contractService.balanceOf(config.getContractAddress(), defaultUser);
+                return Web3jUtil.getValue(balance, config.getId(), redisTemplate);
+            }
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
         }
     }
 }

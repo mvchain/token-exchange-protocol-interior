@@ -18,8 +18,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-@EnableTransactionManagement
 @EnableSwagger2
+@EnableTransactionManagement
 public class TokenSellConsoleBootstrap {
     public static void main(String[] args) {
         new SpringApplicationBuilder(TokenSellConsoleBootstrap.class).web(true).run(args);
