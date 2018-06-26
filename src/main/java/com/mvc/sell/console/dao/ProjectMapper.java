@@ -32,7 +32,7 @@ public interface ProjectMapper extends Mapper<Project> {
     @Select("select * from project t1, project_sold t2 where t1.id = t2.id and t1.id = #{id} and t1.need_show = 1")
     MyProjectVO detail(MyProjectDTO myProjectDTO);
 
-    @Select("SELECT (SELECT IFNULL(balance,0) FROM capital WHERE user_id = #{userId} and token_id = 0) eth_balance, ratio, id project_id, token_name FROM project WHERE id = #{id}")
+    @Select("SELECT (SELECT IFNULL(balance,0) FROM capital WHERE user_id = #{userId} and token_id = (SELECT id FROM config WHERE token_name = ifnull(project.coin, 'eth')) ) eth_balance, ratio, id project_id, token_name FROM project WHERE id = #{id}")
     ProjectInfoVO getInfoByUser(@Param("id") BigInteger id, @Param("userId") BigInteger userId);
 
     @Update("update project set status = 1 where start_time < now() and status = 0")
