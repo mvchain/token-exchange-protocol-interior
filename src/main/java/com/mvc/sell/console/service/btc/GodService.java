@@ -60,7 +60,7 @@ public class GodService extends BaseService {
         Exception e = null;
         try {
             Long lock = btcdClient.getInfo().getUnlockedUntil();
-            if (null != lock && lock > 0) {
+            if (null != lock) {
                 btcdClient.walletPassphrase(password, 5);
             }
             String result = btcdClient.sendToAddress(transaction.getToAddress(), transaction.getRealNumber());
