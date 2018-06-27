@@ -60,34 +60,39 @@ public class GodRunner implements CommandLineRunner {
         }
     }
 
-    private void start() throws BitcoindException, IOException, CommunicationException, InterruptedException {
-        String key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
-        if (null == key) {
-            redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, btcdClient.listSinceBlock().getLastBlock());
-        }
-        while (true) {
-            BigInteger tokenId = getTokenId();
-            if (null == tokenId) {
-                continue;
+    private void start() {
+        try {
+            String key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
+            if (null == key) {
+                redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, btcdClient.listSinceBlock().getLastBlock());
             }
-            Thread.sleep(10);
-            key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
-            Block block = btcdClient.getBlock(key);
-            for (String txId : block.getTx()) {
-                Transaction tx = null;
-                try {
-                    tx = btcdClient.getTransaction(txId);
-                    com.mvc.sell.console.pojo.bean.Transaction transaction = getTransaction(tx);
-                    transactionService.insertOrUpdate(transaction);
-                } catch (Exception e) {
-                    // not mine tx
-                    log.info(e.getMessage());
+            while (true) {
+                BigInteger tokenId = getTokenId();
+                if (null == tokenId) {
                     continue;
                 }
+                Thread.sleep(10);
+                key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
+                Block block = btcdClient.getBlock(key);
+                for (String txId : block.getTx()) {
+                    Transaction tx = null;
+                    try {
+                        tx = btcdClient.getTransaction(txId);
+                        com.mvc.sell.console.pojo.bean.Transaction transaction = getTransaction(tx);
+                        transactionService.insertOrUpdate(transaction);
+                    } catch (Exception e) {
+                        // not mine tx
+                        log.info(e.getMessage());
+                        continue;
+                    }
+                }
+                if (null != block.getNextBlockHash()) {
+                    redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, block.getNextBlockHash());
+                }
             }
-            if (null != block.getNextBlockHash()) {
-                redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, block.getNextBlockHash());
-            }
+        } catch (Exception e) {
+            log.warning(e.getMessage());
+            start();
         }
     }
 
