@@ -1,15 +1,11 @@
 package com.mvc.sell.console.util;
 
-import com.neemre.btcdcli4j.core.BitcoindException;
-import com.neemre.btcdcli4j.core.CommunicationException;
-import com.neemre.btcdcli4j.core.client.BtcdClient;
-import com.neemre.btcdcli4j.core.client.BtcdClientImpl;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public final class ResourceUtils {
@@ -21,17 +17,13 @@ public final class ResourceUtils {
         return httpProvider;
     }
 
-    public static BtcdClient getBtcdProvider() throws BitcoindException, CommunicationException,
-            IOException {
-        return new BtcdClientImpl(getHttpProvider(), getNodeConfig());
-    }
-
-    public static Properties getNodeConfig() throws IOException {
-        ClassPathResource resource = new ClassPathResource("application.yml");
-        InputStream inputStream = resource.getInputStream();
+    public static Properties getNodeConfig(InputStream inputStream) throws IOException {
+//        String filePath = System.getProperty("user.dir") + "/application.yml";
+//        InputStream inputStream = new BufferedInputStream(new FileInputStream(filePath));
+//        ClassPathResource resource = getResourceAsStream("application.yml");
+//        InputStream inputStream = resource.getInputStream();
         Properties nodeConfig = new Properties();
         nodeConfig.load(inputStream);
-        inputStream.close();
         return nodeConfig;
     }
 }

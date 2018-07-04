@@ -22,7 +22,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.quorum.Quorum;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -102,8 +102,10 @@ public class BeanConfig {
 
     @Bean
     public BtcdClient btcdClient() throws IOException, BitcoindException, CommunicationException {
+        InputStream in = getClass().getClassLoader().getResourceAsStream("application.yml");
         CloseableHttpClient httpProvider = ResourceUtils.getHttpProvider();
-        Properties nodeConfig = ResourceUtils.getNodeConfig();
+        Properties nodeConfig = ResourceUtils.getNodeConfig(in);
+        in.close();
         BtcdClient client = new VerboseBtcdClientImpl(httpProvider, nodeConfig);
         return client;
     }
