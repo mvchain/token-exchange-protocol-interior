@@ -27,7 +27,7 @@ public final class ResourceUtils {
     }
 
     public static Properties getNodeConfig() throws IOException {
-        ClassPathResource resource = new ClassPathResource("node_config.properties");
+        ClassPathResource resource = new ClassPathResource("application.yml");
         InputStream inputStream = resource.getInputStream();
         Properties nodeConfig = new Properties();
         nodeConfig.load(inputStream);
