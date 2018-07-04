@@ -39,6 +39,8 @@ public class BeanConfig {
     public String WALLET_SERVICE;
     @Value("${service.xlm}")
     public String xlm;
+    @Value("${btcd.config.path}")
+    private String path;
 
     @Bean
     public OkHttpClient okHttpClient() throws IOException {
@@ -102,10 +104,8 @@ public class BeanConfig {
 
     @Bean
     public BtcdClient btcdClient() throws IOException, BitcoindException, CommunicationException {
-        InputStream in = getClass().getClassLoader().getResourceAsStream("application.yml");
         CloseableHttpClient httpProvider = ResourceUtils.getHttpProvider();
-        Properties nodeConfig = ResourceUtils.getNodeConfig(in);
-        in.close();
+        Properties nodeConfig = ResourceUtils.getNodeConfig(path);
         BtcdClient client = new VerboseBtcdClientImpl(httpProvider, nodeConfig);
         return client;
     }

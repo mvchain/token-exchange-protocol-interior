@@ -4,6 +4,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -17,11 +19,8 @@ public final class ResourceUtils {
         return httpProvider;
     }
 
-    public static Properties getNodeConfig(InputStream inputStream) throws IOException {
-//        String filePath = System.getProperty("user.dir") + "/application.yml";
-//        InputStream inputStream = new BufferedInputStream(new FileInputStream(filePath));
-//        ClassPathResource resource = getResourceAsStream("application.yml");
-//        InputStream inputStream = resource.getInputStream();
+    public static Properties getNodeConfig(String path) throws IOException {
+        InputStream inputStream = new BufferedInputStream(new FileInputStream(path));
         Properties nodeConfig = new Properties();
         nodeConfig.load(inputStream);
         return nodeConfig;
