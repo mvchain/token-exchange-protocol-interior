@@ -22,13 +22,17 @@ public class MyStartupRunner implements CommandLineRunner {
 
     @Override
     @Async
-    public void run(String... args) throws InterruptedException {
-        transactionService.initConfig();
-        transactionService.startHistory();
+    public void run(String... args) {
+        try {
+            transactionService.initConfig();
+            transactionService.startHistory();
 //        transactionService.startListen();
-        while (true) {
-            transactionService.startTransaction();
-            Thread.sleep(1);
+            while (true) {
+                transactionService.startTransaction();
+                Thread.sleep(1);
+            }
+        } catch (Exception e) {
+            transactionService.startHistory();
         }
     }
 

@@ -35,6 +35,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.Contract;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -227,7 +228,9 @@ public class TransactionService extends BaseService {
             if (null == transaction) {
                 return;
             }
-            if (web3j.ethGetTransactionByHash(hash).send().hasError()) {
+            TransactionReceipt result2 = web3j.ethGetTransactionReceipt(tx.getHash()).send().getResult();
+            Boolean isFail = !"0x".equalsIgnoreCase(tx.getInput()) & result2.getLogs().size() == 0 && null != result2.getGasUsed() && result2.getGasUsed().compareTo(BigInteger.ZERO) > 0;
+            if (isFail) {
                 transaction.setStatus(CommonConstants.ERROR);
             } else {
                 transaction.setStatus(CommonConstants.STATUS_SUCCESS);
@@ -269,7 +272,14 @@ public class TransactionService extends BaseService {
         transaction.setTokenId(tokenId);
         transaction.setOrderId(getOrderId(CommonConstants.ORDER_RECHARGE));
         transaction.setType(CommonConstants.RECHARGE);
-        transaction.setStatus(CommonConstants.STATUS_SUCCESS);
+        TransactionReceipt result2 = null;
+        try {
+            result2 = web3j.ethGetTransactionReceipt(tx.getHash()).send().getResult();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Boolean isFail = !"0x".equalsIgnoreCase(tx.getInput()) & result2.getLogs().size() == 0 && null != result2.getGasUsed() && result2.getGasUsed().compareTo(BigInteger.ZERO) > 0;
+        transaction.setStatus(isFail ? CommonConstants.ERROR : CommonConstants.STATUS_SUCCESS);
         transaction.setToAddress(to);
         transaction.setFromAddress(tx.getFrom());
         BigInteger value = Web3jUtil.isContractTx(tx) ? new BigInteger(tx.getInput().substring(tx.getInput().length() - 64), 16) : tx.getValue();
@@ -277,10 +287,12 @@ public class TransactionService extends BaseService {
         transaction.setPoundage(0f);
         transaction.setRealNumber(transaction.getNumber());
         transactionMapper.insertSelective(transaction);
-        // update balance
-        updateBalance(transaction);
-        // transfer balance
-        this.transferBalance(transaction, coldUser);
+        if (!isFail) {
+            // update balance
+            updateBalance(transaction);
+            // transfer balance
+            this.transferBalance(transaction, coldUser);
+        }
     }
 
     private void updateBalance(Transaction transaction) {
@@ -390,12 +402,16 @@ public class TransactionService extends BaseService {
     }
 
     @Async
-    public void startHistory() throws InterruptedException {
+    public void startHistory() {
         try {
             // listen history transaction
             historyListen();
         } catch (Exception e) {
-            Thread.sleep(3000);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
             startHistory();
         }
     }
