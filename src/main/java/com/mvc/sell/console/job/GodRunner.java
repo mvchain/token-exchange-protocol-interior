@@ -74,6 +74,10 @@ public class GodRunner implements CommandLineRunner {
                 Thread.sleep(10);
                 key = (String) redisTemplate.opsForValue().get(RedisConstants.LAST_TOKEN_GOD);
                 Block block = btcdClient.getBlock(key);
+                if (block.getConfirmations() == -1) {
+                    redisTemplate.opsForValue().set(RedisConstants.LAST_TOKEN_GOD, block.getPreviousBlockHash());
+                    continue;
+                }
                 for (String txId : block.getTx()) {
                     Transaction tx = null;
                     try {
