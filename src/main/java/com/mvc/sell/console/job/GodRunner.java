@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * @author qyc
  */
-@Component
+//@Component
 @Order(value = 4)
 @Log
 public class GodRunner implements CommandLineRunner {

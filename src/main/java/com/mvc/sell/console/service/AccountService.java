@@ -24,8 +24,8 @@ import java.util.List;
 @Service
 public class AccountService extends BaseService {
 
-    @Autowired
-    private GodService godService;
+//    @Autowired
+//    private GodService godService;
 
     public PageInfo<AccountVO> list(UserFindDTO userFindDTO) {
         Account account = new Account();
@@ -45,9 +45,9 @@ public class AccountService extends BaseService {
             address.setTokenType(tokenName.toUpperCase());
             address.setUserId(account.getId());
             address = addressMapper.selectOne(address);
-            if (null == address) {
-                address = godService.newAddress(tokenName, account.getId());
-            }
+//            if (null == address) {
+//                address = godService.newAddress(tokenName, account.getId());
+//            }
             if (null != address) {
                 account.setAddressEth(address.getAddress());
             }

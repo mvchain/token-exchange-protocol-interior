@@ -102,7 +102,7 @@ public class BeanConfig {
         return server;
     }
 
-    @Bean
+//    @Bean
     public BtcdClient btcdClient() throws IOException, BitcoindException, CommunicationException {
         CloseableHttpClient httpProvider = ResourceUtils.getHttpProvider();
         Properties nodeConfig = ResourceUtils.getNodeConfig(path);

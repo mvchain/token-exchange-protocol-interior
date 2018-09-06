@@ -20,7 +20,7 @@ import java.math.BigInteger;
  * @author qiyichen
  * @create 2018/6/15 17:12
  */
-@Service
+//@Service
 @Log4j
 public class GodService extends BaseService {
 

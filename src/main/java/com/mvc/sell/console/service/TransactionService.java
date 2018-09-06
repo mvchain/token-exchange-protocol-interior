@@ -81,8 +81,8 @@ public class TransactionService extends BaseService {
     ContractService contractService;
     @Autowired
     XlmService xlmService;
-    @Autowired
-    GodService godService;
+//    @Autowired
+//    GodService godService;
 
     public final static BigInteger DEFAULT_GAS_PRICE = Contract.GAS_PRICE.divide(BigInteger.valueOf(5));
     public final static BigInteger DEFAULT_GAS_LIMIT = Contract.GAS_LIMIT.divide(BigInteger.valueOf(10));
@@ -126,10 +126,10 @@ public class TransactionService extends BaseService {
             if (config.equalsIgnoreCase("XLM") || config.startsWith("XLM-")) {
                 xlmService.sendTransaction(transaction, config);
             } else if ("god".equalsIgnoreCase(config)) {
-                String hash = godService.sendTransaction(transaction, config);
-                transaction.setStatus(CommonConstants.WITHDRAW);
-                transaction.setHash(hash);
-                transactionMapper.updateByPrimaryKeySelective(transaction);
+//                String hash = godService.sendTransaction(transaction, config);
+//                transaction.setStatus(CommonConstants.WITHDRAW);
+//                transaction.setHash(hash);
+//                transactionMapper.updateByPrimaryKeySelective(transaction);
             } else {
                 transaction.setNumber(transaction.getRealNumber());
                 redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_TRANS, transaction);
