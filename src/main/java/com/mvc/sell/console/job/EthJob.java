@@ -25,10 +25,16 @@ public class EthJob {
     Web3j web3j;
 
     @Scheduled(cron = "*/10 * * * * ?")
-    public void updateAddress() throws IOException {
-        Integer num = transactionService.newAddress();
-        if (num > 0) {
-            log.info(String.format("%s user update eth address", num));
+    public void updateAddress() {
+        try {
+            Integer num = transactionService.newAddress();
+            if (num > 0) {
+                log.info(String.format("%s user update eth address", num));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+
         }
     }
 

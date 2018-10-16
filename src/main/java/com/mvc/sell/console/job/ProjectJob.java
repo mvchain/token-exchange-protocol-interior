@@ -25,10 +25,14 @@ public class ProjectJob {
     Web3j web3j;
 
     @Scheduled(cron = "*/1 * * * * ?")
-    public void updateStatus() throws IOException {
-        Integer num = projectService.updateStatus();
-        if (num > 0) {
-            log.info(String.format("%s project update status", num));
+    public void updateStatus() {
+        try {
+            Integer num = projectService.updateStatus();
+            if (num > 0) {
+                log.info(String.format("%s project update status", num));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
