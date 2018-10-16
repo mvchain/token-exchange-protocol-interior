@@ -7,8 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.web3j.protocol.Web3j;
 
-import java.io.IOException;
-
 /**
  * eth job
  *
@@ -27,8 +25,7 @@ public class ProjectJob {
     @Scheduled(cron = "*/2 * * * * ?")
     public void updateStatus() {
         try {
-            Integer num = projectService.updateStatus();
-            System.out.println("Scheduled is running");
+            projectService.updateStatus();
         } catch (Exception e) {
             e.printStackTrace();
         }
