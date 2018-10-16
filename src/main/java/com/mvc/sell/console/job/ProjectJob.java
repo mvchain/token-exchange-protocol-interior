@@ -28,6 +28,7 @@ public class ProjectJob {
     public void updateStatus() {
         try {
             Integer num = projectService.updateStatus();
+            System.out.println("Scheduled is running");
             if (num > 0) {
                 log.info(String.format("%s project update status", num));
             }
