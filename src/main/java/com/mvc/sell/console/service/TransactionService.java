@@ -56,7 +56,6 @@ import java.util.stream.Collectors;
  */
 @Service
 @Log4j
-@Transactional(rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRED)
 public class TransactionService extends BaseService {
 
     @Autowired
