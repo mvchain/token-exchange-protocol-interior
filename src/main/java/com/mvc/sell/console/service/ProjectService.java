@@ -14,6 +14,7 @@ import com.mvc.sell.console.pojo.vo.*;
 import com.mvc.sell.console.util.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -264,6 +265,7 @@ public class ProjectService extends BaseService {
         Assert.isTrue(encoder.matches(withdrawDTO.getTransactionPassword(), account.getTransactionPassword()), MessageConstants.getMsg("TRANSFER_USER_PWD_ERR"));
     }
 
+    @Async
     public Integer updateStatus() {
         Integer number = 0;
         number = number + projectMapper.updateStart();
