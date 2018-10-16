@@ -383,6 +383,7 @@ public class TransactionService extends BaseService {
         }
     }
 
+    @Async
     public Integer newAddress() throws IOException {
         Account account = null;
         Integer num = 0;
