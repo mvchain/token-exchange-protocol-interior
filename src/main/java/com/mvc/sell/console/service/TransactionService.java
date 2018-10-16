@@ -386,8 +386,8 @@ public class TransactionService extends BaseService {
     public Integer newAddress() throws IOException {
         Account account = null;
         Integer num = 0;
-        while (null != (account = accountService.getNonAddress())) {
-            String key = CommonConstants.TOKEN_SELL_USER;
+        String key = CommonConstants.TOKEN_SELL_USER;
+        while (null != (account = accountService.getNonAddress()) && redisTemplate.opsForList().size(key) > 0) {
             String address = (String) redisTemplate.opsForList().rightPop(key);
             account.setAddressEth(address);
             accountService.update(account);
