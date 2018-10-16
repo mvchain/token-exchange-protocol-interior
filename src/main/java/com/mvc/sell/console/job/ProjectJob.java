@@ -29,9 +29,6 @@ public class ProjectJob {
         try {
             Integer num = projectService.updateStatus();
             System.out.println("Scheduled is running");
-            if (num > 0) {
-                log.info(String.format("%s project update status", num));
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }

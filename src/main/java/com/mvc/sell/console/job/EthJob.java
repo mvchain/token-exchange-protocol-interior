@@ -27,10 +27,7 @@ public class EthJob {
     @Scheduled(cron = "*/10 * * * * ?")
     public void updateAddress() {
         try {
-            Integer num = transactionService.newAddress();
-            if (num > 0) {
-                log.info(String.format("%s user update eth address", num));
-            }
+            transactionService.newAddress();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
