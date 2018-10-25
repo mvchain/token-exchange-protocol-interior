@@ -220,7 +220,7 @@ public class ProjectService extends BaseService {
         transaction.setUserId(getUserId());
         transaction.setTokenId(config.getId());
         String fromUser = coldUser;
-        if (config.getContractAddress().equalsIgnoreCase("XLM") || config.getContractAddress().startsWith("XLM-")) {
+        if (null != config.getContractAddress() && (config.getContractAddress().equalsIgnoreCase("XLM") || config.getContractAddress().startsWith("XLM-"))) {
             fromUser = xlmUser;
         }
         transaction.setFromAddress(fromUser);
