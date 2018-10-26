@@ -11,7 +11,6 @@ import com.mvc.sell.console.pojo.bean.Config;
 import com.mvc.sell.console.pojo.bean.Transaction;
 import com.mvc.sell.console.pojo.dto.TransactionDTO;
 import com.mvc.sell.console.pojo.vo.TransactionVO;
-import com.mvc.sell.console.service.btc.GodService;
 import com.mvc.sell.console.service.ethernum.ContractService;
 import com.mvc.sell.console.service.ethernum.Orders;
 import com.mvc.sell.console.util.BeanUtil;
@@ -123,9 +122,9 @@ public class TransactionService extends BaseService {
             transaction.setId(id);
             transaction = transactionMapper.selectByPrimaryKey(transaction);
             String config = getContractAddressByTokenId(transaction);
-            if (config.equalsIgnoreCase("XLM") || config.startsWith("XLM-")) {
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(config) && (config.equalsIgnoreCase("XLM") || config.startsWith("XLM-"))) {
                 xlmService.sendTransaction(transaction, config);
-            } else if ("god".equalsIgnoreCase(config)) {
+            } else if (org.apache.commons.lang3.StringUtils.isNotBlank(config) && "god".equalsIgnoreCase(config)) {
 //                String hash = godService.sendTransaction(transaction, config);
 //                transaction.setStatus(CommonConstants.WITHDRAW);
 //                transaction.setHash(hash);
