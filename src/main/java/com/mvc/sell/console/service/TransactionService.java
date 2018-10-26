@@ -485,9 +485,9 @@ public class TransactionService extends BaseService {
         if ("all".equalsIgnoreCase(type)) {
             startWith = "";
         } else if ("transaction".equalsIgnoreCase(type)) {
-            startWith = "T_T";
+            startWith = "T";
         } else {
-            startWith = "T_C";
+            startWith = "C";
         }
         return startWith;
     }
