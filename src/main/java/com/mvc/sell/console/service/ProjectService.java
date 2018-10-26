@@ -12,6 +12,7 @@ import com.mvc.sell.console.pojo.dto.ProjectDTO;
 import com.mvc.sell.console.pojo.dto.WithdrawDTO;
 import com.mvc.sell.console.pojo.vo.*;
 import com.mvc.sell.console.util.BeanUtil;
+import com.mvc.sell.console.util.Web3jUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -47,8 +48,6 @@ public class ProjectService extends BaseService {
     OrderService orderService;
     @Value("${wallet.user}")
     String defaultUser;
-    @Value("${wallet.coldUser}")
-    String coldUser;
     @Value("${wallet.xlm.user}")
     String xlmUser;
 
@@ -219,7 +218,7 @@ public class ProjectService extends BaseService {
         transaction.setType(CommonConstants.WITHDRAW);
         transaction.setUserId(getUserId());
         transaction.setTokenId(config.getId());
-        String fromUser = coldUser;
+        String fromUser = Web3jUtil.getColdUser(redisTemplate);
         if (null != config.getContractAddress() && (config.getContractAddress().equalsIgnoreCase("XLM") || config.getContractAddress().startsWith("XLM-"))) {
             fromUser = xlmUser;
         }

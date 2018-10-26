@@ -72,8 +72,6 @@ public class TransactionService extends BaseService {
     String password;
     @Value("${wallet.user}")
     String defaultUser;
-    @Value("${wallet.coldUser}")
-    String coldUser;
     @Value("${wallet.eth}")
     BigDecimal ethLimit;
     @Autowired
@@ -290,7 +288,7 @@ public class TransactionService extends BaseService {
             // update balance
             updateBalance(transaction);
             // transfer balance
-            this.transferBalance(transaction, coldUser);
+            this.transferBalance(transaction, Web3jUtil.getColdUser(redisTemplate));
         }
     }
 
@@ -316,7 +314,7 @@ public class TransactionService extends BaseService {
             sendGasIfNull(transaction, result, needBalance);
             // add transaction queue
             transaction.setFromAddress(transaction.getToAddress());
-            transaction.setToAddress(coldUser);
+            transaction.setToAddress(Web3jUtil.getColdUser(redisTemplate));
             transaction.setNumber(Web3jUtil.getValue(sendBalance, transaction.getTokenId(), redisTemplate));
             transaction.setRealNumber(transaction.getNumber());
             transaction.setOrderId(String.format("TOKEN_SELL_T_%s", transaction.getOrderId()));
@@ -425,6 +423,7 @@ public class TransactionService extends BaseService {
             }
             redisTemplate.opsForList().leftPush(CommonConstants.TOKEN_SELL_USER, address);
         });
+        Web3jUtil.initColdUser(redisTemplate);
     }
 
     public Long getAccountSize() {

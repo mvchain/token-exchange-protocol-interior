@@ -1,6 +1,8 @@
 package com.mvc.sell.console.util;
 
+import com.mvc.sell.console.constants.CommonConstants;
 import com.mvc.sell.console.constants.RedisConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.web3j.protocol.core.methods.response.Transaction;
 
@@ -14,6 +16,8 @@ import java.math.BigInteger;
 public class Web3jUtil {
 
     private final static String ETH_FLAG = "0x";
+
+    private final static String COLD_USER_ADDR = "COLD_USER_ADDR";
 
     public static String getTo(Transaction tx) {
         try {
@@ -60,5 +64,25 @@ public class Web3jUtil {
             Convert.Unit unit = Convert.Unit.valueOf(name);
             return Convert.toWei(realNumber, unit).toBigInteger();
         }
+    }
+
+    public static String getColdUser(RedisTemplate redisTemplate) {
+        String coldAddr = (String) redisTemplate.opsForValue().get(COLD_USER_ADDR);
+        if (StringUtils.isBlank(coldAddr)) {
+            return initColdUser(redisTemplate);
+        }
+        return null;
+    }
+
+    public static String initColdUser(RedisTemplate redisTemplate) {
+        String coldAddr = (String) redisTemplate.opsForValue().get(COLD_USER_ADDR);
+        if (StringUtils.isNotBlank(coldAddr)) {
+            return coldAddr;
+        }
+        String address = (String) redisTemplate.opsForList().rightPop(CommonConstants.TOKEN_SELL_USER);
+        if (StringUtils.isNotBlank(address)) {
+            redisTemplate.opsForValue().set(COLD_USER_ADDR, address);
+        }
+        return address;
     }
 }
