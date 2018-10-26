@@ -71,7 +71,7 @@ public class Web3jUtil {
         if (StringUtils.isBlank(coldAddr)) {
             return initColdUser(redisTemplate);
         }
-        return null;
+        return coldAddr;
     }
 
     public static String initColdUser(RedisTemplate redisTemplate) {
